@@ -1,0 +1,178 @@
+---
+title: "Documentación Análisis de Pertinencia de Obras Carreteras"
+author: "Jair"
+format: html
+editor: visual
+---
+
+## Lista de consideraciones
+
+-   Accesibilidad carretera a cabeceras municipales
+
+-   Distancia a Escuelas
+
+-   Distancia a Centros de Trabajo
+
+-   Distancia a Hospitales
+
+-   Áreas Naturales Protegidas (Distancia)
+
+-   Zonas Prioritarias (Distancia)
+
+-   Secciones Electorales (Prioritarias)
+
+-   Nivel de uso
+
+-   Distancia a localidades Marginadas (Alta y Muy alta)
+
+-   Localidades con bajo acceso a agua entubada (Porcentaje)
+
+-   Localidades con bajo acceso a drenaje sanitario (Porcentaje)
+
+## Preprocesamiento
+
+Se definen rasters
+
+```{r}
+#| include: true
+#| echo: false
+#| message: false
+#| warning: false
+library(raster)
+library(viridis)
+library(htmlwidgets)
+#library(slickR)
+source("Códigos/leer_rasters_generados_en_r.R")
+clean_names <- gsub("\\.tif$", "", basename(rasters_list))
+
+# Loop through each raster and generate its plot
+for (i in 1:length(rasters)) {
+  # Add a title before each plot
+  cat(paste0("### ", clean_names[i], "\n\n")) # Markdown heading for each plot
+
+  # Generate the plot
+  plot(rasters[[i]],
+       main = paste("Interpretación: ", clean_names[i]), # More descriptive main title
+       col = viridis(256), # Use viridis color palette
+       legend = TRUE)
+
+  # Add a horizontal rule for visual separation
+  cat("\n---\n\n")
+}
+```
+
+Agregamos un widget para la exploración de algunos de los rasters utilizados y obras de tipo línea y punto
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+library(sf)
+source("Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R")
+```
+
+```{r}
+#| include: false
+#| echo: false
+#| message: false
+#| warning: false
+
+#library(crosstalk)
+library(leaflet)
+library(DT)
+#library(dplyr)
+#library(reactable)
+
+#obras_sipdus_carretera_multipunto es un sf de puntos
+#obras_sipdus_carretera_multilinea es un sf de lineas
+
+# SharedData_multipoint =SharedData$new(obras_sipdus_carretera_multipunto|> as("Spatial"), group = "obras_sipdus")
+#  SharedData_multilinea <- SharedData$new(obras_sipdus_carretera_linea  |> as("Spatial"), group = "obras_sipdus")
+
+#SharedData_multilinea+SharedData_multipoint deberían ser un mismo SharedData tipo lista y que se pueda acceder a cada uno como SharedData[[1]] y SharedData[[2]]
+
+# A regular data frame (without coordinates) for the table.
+# obras_sipdus_tabla <- as_tibble(
+#   obras_sipdus_carretera#Notar que este incluye tanto lineas como puntos
+#                                 )|> dplyr::select(ID_OBRA,Municipio,Rubro,Ejercicio,
+#                                                                             #Obra,
+#                                                                             Inversión,Habitantes.beneficiados,Ejecutora,Geometria_tipo) |> 
+#   SharedData$new(group = "obras_sipdus")
+# 
+# map <- leaflet() |> addTiles(options = leaflet::tileOptions(opacity = 0.5)) |> 
+#   addRasterImage(rasters[[1]],opacity = 0.5,group = "Accesibilidad") |>
+#   addRasterImage(rasters[[2]],opacity = 0.5,group = "Distancia centros de trabajo") |>
+#   addRasterImage(rasters[[3]],opacity = 0.5,group = "Distancia áreas naturales protegidas") |>
+#   addRasterImage(rasters[[4]],opacity = 0.5,group = "Distancia Escuelas") |>
+#   addRasterImage(rasters[[5]],opacity = 0.5,group = "Distancia Hospitales") |>
+#   addRasterImage(rasters[[6]],opacity = 0.5,group = "Distancia a localidades marginadas") |>
+#   addRasterImage(rasters[[7]],opacity = 0.5,group = "Distancia a ZAP") |>
+#   addPolylines(data=SharedData_multilinea
+#                ,group = "Obras_tipo_linea"
+#                ,label = obras_sipdus_carretera_linea$Obra
+#   ) |>
+#   # addMarkers(data=obras_sipdus_carretera_punto,group = "Obras_tipo_punto",
+#   #            label = obras_sipdus_carretera_punto$Obra) |>
+#   addMarkers(data=SharedData_multipoint,group = "Obras_tipo_multipunto",
+#              label = obras_sipdus_carretera_multipunto$Obra) |>
+#   addLayersControl(overlayGroups = c("Accesibilidad",
+#                                      "Distancia centros de trabajo",
+#                                      "Distancia áreas naturales protegidas",
+#                                      "Distancia Escuelas",
+#                                      "Distancia Hospitales",
+#                                      "Distancia a localidades marginadas",
+#                                      "Distancia a ZAP"
+#                                      ,"Obras_tipo_linea","Obras_tipo_multilinea","Obras_tipo_multipunto"))
+# 
+# tbl <- reactable(
+#   obras_sipdus_tabla,
+#   selection = "multiple",
+#   onClick = "select",
+#   rowStyle = list(cursor = "pointer"),
+#   minRows = 10,filterable = T,showPageSizeOptions = T,highlight = T,striped = T,showSortIcon = T
+# )
+# 
+# htmltools::browsable(
+#   htmltools::tagList(map, tbl)
+# )
+
+```
+
+```{r}
+#| include: true
+#| echo: false
+#| message: false
+#| warning: false
+
+leaflet() |> addTiles(options = leaflet::tileOptions(opacity = 0.5)) |>
+  addRasterImage(rasters[[1]],opacity = 0.4,group = "Accesibilidad") |>
+  addRasterImage(rasters[[2]],opacity = 0.4,group = "Distancia centros de trabajo") |>
+  addRasterImage(rasters[[3]],opacity = 0.4,group = "Distancia áreas naturales protegidas") |>
+  addRasterImage(rasters[[4]],opacity = 0.4,group = "Distancia Escuelas") |>
+  addRasterImage(rasters[[5]],opacity = 0.4,group = "Distancia Hospitales") |>
+  addRasterImage(rasters[[6]],opacity = 0.4,group = "Distancia a localidades marginadas") |>
+  addRasterImage(rasters[[7]],opacity = 0.4,group = "Distancia a ZAP") |>
+  addPolylines(data=obras_sipdus_carretera_linea
+               ,group = "Obras_tipo_linea"
+               ,label = obras_sipdus_carretera_linea$Obra
+  ) |>
+  # addMarkers(data=obras_sipdus_carretera_punto,group = "Obras_tipo_punto",
+  #            label = obras_sipdus_carretera_punto$Obra) |>
+  addMarkers(data=obras_sipdus_carretera_multipunto,group = "Obras_tipo_multipunto",
+             label = obras_sipdus_carretera_multipunto$Obra) |>
+  addLayersControl(overlayGroups = c("Accesibilidad",
+                                     "Distancia centros de trabajo",
+                                     "Distancia áreas naturales protegidas",
+                                     "Distancia Escuelas",
+                                     "Distancia Hospitales",
+                                     "Distancia a localidades marginadas",
+                                     "Distancia a ZAP"
+                                     ,"Obras_tipo_linea","Obras_tipo_multipunto"))
+```
+
+```{r}
+#| echo: false
+
+datatable(obras_sipdus_carretera |> dplyr::select(ID_OBRA,Municipio,Rubro,Ejercicio,Inversión,Habitantes.beneficiados,Ejecutora,Obra))
+
+```
