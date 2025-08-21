@@ -12,9 +12,9 @@ secciones=secciones |>
   
 
 secciones=secciones |> 
-  dplyr::group_by(NOM_MUN) |> 
-  dplyr::summarise(pob_mun=sum(TOTAL,na.rm=T)) |> st_drop_geometry() |> merge(secciones,by='NOM_MUN') |> 
-  dplyr::mutate(porc_morena_d_mun=MORENA_PNA/pob_mun)##Calculamos el porcentaje de los votos de esa seccion con respecto a la poblacion municipal
+  #dplyr::group_by(NOM_MUN) |> 
+  #dplyr::summarise(pob_mun=sum(TOTAL,na.rm=T)) |> st_drop_geometry() |> merge(secciones,by='NOM_MUN') |> 
+  dplyr::mutate(dens_votos_morena=100*(MORENA_PNA/TOTAL))##Calculamos el porcentaje de los votos de esa seccion con respecto a la poblacion municipal
   #Se interpreta como ##Esta sección acumula mucho voto a morena
 
 ##El filtro va a ser el top necesario para ganar el +30% de la población votante por municipio.
@@ -27,15 +27,15 @@ secciones_top_morena=secciones |>
 secciones_top_morena$geometry |> plot()#Vemos la cobertura estatal
 
 
-secciones_top_morena_vect=terra::vect(secciones_top_morena |> st_as_sf() |> st_transform(st_crs(municipios)))
+secciones_top_morena_vect=terra::vect(secciones |> st_as_sf() |> st_transform(st_crs(municipios)))
 ######
 #Le damos prioridad a las secciones por población_habitante_en_sección
 
-secciones_top_morena_vect <- terra::rasterize(secciones_top_morena_vect, base, field = "porc_morena_d_mun", fun = "max")
+secciones_top_morena_vect <- terra::rasterize(secciones_top_morena_vect, base, field = "dens_votos_morena", fun = "mean")
 
 #values(base) <- sample(1:ncell(base),size = ncell(base),replace = T)
 plot(secciones_top_morena_vect)
 plot(st_geometry(municipios), add = TRUE, border = "red", lwd = 2)
 #####################
 
-#secciones_top_morena_vect |> writeRaster("Inputs/Rasters_Generados_en_R/Secciones_electorales_prioritarias_slice_top_p_mun.tif",overwrite=T)
+secciones_top_morena_vect |> writeRaster("Inputs/Rasters_Generados_en_R/Secciones_electorales_prioritarias_slice_top_p_mun.tif",overwrite=T)

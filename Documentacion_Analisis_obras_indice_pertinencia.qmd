@@ -25,40 +25,39 @@ editor: visual
 
 -   Distancia a localidades Marginadas (Alta y Muy alta)
 
--   Localidades con bajo acceso a agua entubada (Porcentaje)
+-   Distancia a localidades con bajo acceso a agua entubada
 
--   Localidades con bajo acceso a drenaje sanitario (Porcentaje)
+-   Distancia a localidades con bajo acceso a drenaje sanitario
 
-## Preprocesamiento
+## Preprocesamiento y exploración
 
 Se definen rasters
 
 ```{r}
-#| include: true
 #| echo: false
 #| message: false
 #| warning: false
+#| include: true
 library(raster)
 library(viridis)
 library(htmlwidgets)
-#library(slickR)
+library(slickR)
 source("Códigos/leer_rasters_generados_en_r.R")
-clean_names <- gsub("\\.tif$", "", basename(rasters_list))
-
-# Loop through each raster and generate its plot
-for (i in 1:length(rasters)) {
-  # Add a title before each plot
-  cat(paste0("### ", clean_names[i], "\n\n")) # Markdown heading for each plot
-
-  # Generate the plot
-  plot(rasters[[i]],
-       main = paste("Interpretación: ", clean_names[i]), # More descriptive main title
-       col = viridis(256), # Use viridis color palette
-       legend = TRUE)
-
-  # Add a horizontal rule for visual separation
-  cat("\n---\n\n")
-}
+raster_plots <- list()
+  for (i in 1:length(rasters)){
+    # Crear un archivo PNG temporal para cada gráfico
+    temp_file <- tempfile(fileext = ".png")
+    png(temp_file, width = 600, height = 400)
+    plot(rasters[[i]],
+         col = viridis(256),
+         legend = TRUE,main=rasters_list_names[i])
+    dev.off()
+    raster_plots[[i]] <- temp_file
+  }
+slickR(raster_plots,width = "90%")+ 
+  settings(
+    dots = TRUE
+  )
 ```
 
 Agregamos un widget para la exploración de algunos de los rasters utilizados y obras de tipo línea y punto
@@ -152,6 +151,9 @@ leaflet() |> addTiles(options = leaflet::tileOptions(opacity = 0.5)) |>
   addRasterImage(rasters[[5]],opacity = 0.4,group = "Distancia Hospitales") |>
   addRasterImage(rasters[[6]],opacity = 0.4,group = "Distancia a localidades marginadas") |>
   addRasterImage(rasters[[7]],opacity = 0.4,group = "Distancia a ZAP") |>
+  addRasterImage(rasters[[8]],opacity = 0.4,group = "Dist. loc. bajo acceso agua entubada") |>
+  addRasterImage(rasters[[9]],opacity = 0.4,group = "Dist. loc. bajo acceso drenaje") |>
+  addRasterImage(rasters[[10]],opacity = 0.4,group = "Secciones electorales") |>
   addPolylines(data=obras_sipdus_carretera_linea
                ,group = "Obras_tipo_linea"
                ,label = obras_sipdus_carretera_linea$Obra
@@ -166,13 +168,100 @@ leaflet() |> addTiles(options = leaflet::tileOptions(opacity = 0.5)) |>
                                      "Distancia Escuelas",
                                      "Distancia Hospitales",
                                      "Distancia a localidades marginadas",
-                                     "Distancia a ZAP"
-                                     ,"Obras_tipo_linea","Obras_tipo_multipunto"))
+                                     "Distancia a ZAP","Dist. loc. bajo acceso agua entubada","Dist. loc. bajo acceso drenaje","Secciones electorales",
+                                     "Obras_tipo_linea","Obras_tipo_multipunto"))
 ```
 
 ```{r}
 #| echo: false
+library(DT)
+datatable(obras_sipdus_carretera |> 
+            dplyr::select(ID_OBRA, Municipio, Rubro, Ejercicio, Inversión, Habitantes.beneficiados, Ejecutora, Obra) |> 
+            st_drop_geometry() |> 
+            dplyr::rename(Habitantes_beneficiados=Habitantes.beneficiados), 
+          options = list(
+            rownames = FALSE,
+            columnDefs = list(list(width = '400px', targets = c(7))),
+            scrollX = TRUE,
+            stripeClasses = c('even', 'odd')
+          ),
+          filter = "top")
 
-datatable(obras_sipdus_carretera |> dplyr::select(ID_OBRA,Municipio,Rubro,Ejercicio,Inversión,Habitantes.beneficiados,Ejecutora,Obra))
+```
 
+De todas maneras, aún debemos establecer la interpretación de cada raster, hacer un escalamiento apropiado y definir los pesos de cada raster que definirán la pertinencia de obras.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| include: false
+library(raster)
+library(viridis)
+library(htmlwidgets)
+library(slickR)
+rasters_list_names_interpretaciones=rasters_list_names |> as.list()
+rasters_list_names_interpretaciones[[1]]=paste0(rasters_list_names_interpretaciones[[1]],
+          "-------\n Dado que la distancia se mide en minutos, mayor valor de accesibilidad indica lugares de difícil acceso, en tal caso, un valor alto de accesibilidad indica más perticencia de obras carreteras")
+
+rasters_list_names_interpretaciones[[2]]=paste0(rasters_list_names_interpretaciones[[2]],
+          "-------\n Una distancia corta a centros de trabajo se interpreta como un incentivo a la productividad local, fortaleciendo su acceso y su movilidad. En este caso, la interpretación de distancia sería inversa a la pertinencia.")
+
+rasters_list_names_interpretaciones[[3]]=paste0(rasters_list_names_interpretaciones[[3]],
+          "-------\n Aunque no todas las ANP tienen carácter restictivo, la norma general es la preservación por lo que menor distancia a una ANP debería ser interpretado como baja pertinencia")
+rasters_list_names_interpretaciones[[4]]=paste0(rasters_list_names_interpretaciones[[4]],
+          "-------\n La interpretación es equivalente a la de centros de trabajo. Obras de infraestructura carretera y vialidades urbanas cerca de escuelas se interpreta como un refuerzo a su accesibilidad y movilidad. En este caso, la interpretación de distancia sería inversa a la pertinencia.")
+rasters_list_names_interpretaciones[[5]]=paste0(rasters_list_names_interpretaciones[[5]],
+          "-------\n La interpretación es equivalente a la de centros de trabajo y escuelas. Obras de infraestructura carretera y vialidades urbanas cerca de hospitales y centros de salud se interpreta como un refuerzo a su accesibilidad y movilidad. En este caso, la interpretación de distancia sería inversa a la pertinencia.")
+rasters_list_names_interpretaciones[[6]]=paste0(rasters_list_names_interpretaciones[[6]],
+          "-------\n Dado que tenemos identificadas las localidades (polígonos y puntos) de alto y muy alto grado de marginación, se puede establecer la medida del grado de marginación en los asentamientos humanos en general, y la distancia de una obra al asentamiento dado. En tal caso, la distancia de las localidades marginadas sería inversa a la pertinencia.")
+rasters_list_names_interpretaciones[[7]]=paste0(rasters_list_names_interpretaciones[[7]],
+          "-------\n La interpretación de las zonas de atención prioritaria es equivalente a la de localidades marginadas, con la diferencia de utilizar diferentes criterios para determinar la clasificación de cada zona. En tal caso, la distancia de las zonas de atención prioritaria sería inversa a la pertinencia.")
+rasters_list_names_interpretaciones[[8]]=paste0(rasters_list_names_interpretaciones[[8]],
+          "-------\n Bajo acceso a agua entubada y acceso a drenaje sanitario se definen a partir de límites inferiores dados por cuantiles de los datos a nivel de localidad. Posteriormente se calcula la distancia a las localidades. En tal caso, un valor bajo indica una mayor pertinencia, pues está relacionado a localidades en carencia. ")
+rasters_list_names_interpretaciones[[9]]=paste0(rasters_list_names_interpretaciones[[9]],
+          "-------\n Bajo acceso a agua entubada y acceso a drenaje sanitario se definen a partir de límites inferiores dados por cuantiles de los datos a nivel de localidad. Posteriormente se calcula la distancia a las localidades. En tal caso, un valor bajo indica una mayor pertinencia, pues está relacionado a localidades en carencia. ")
+rasters_list_names_interpretaciones[[10]]=paste0(rasters_list_names_interpretaciones[[10]],
+          "-------\n Para las secciones electorales, se aprovecha el hecho de definir una partición geográfica. En este caso se calcula el porcentaje de votos al partido por cada sección para definir el raster. La interpretación natural es el de incentivar, ya sea para reforzar votos futuros en secciones ya ganadas, o para lograr un porcentaje mayor en secciones perdidas. ")
+
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| include: true
+library(raster)
+library(viridis)
+library(htmlwidgets)
+library(slickR)
+library(grid)
+library(ggplot2)
+raster_plots <- list()
+for (i in 1:length(rasters)){
+  temp_file <- tempfile(fileext = ".png")
+  png(temp_file, width = 600, height = 400)
+  plot(rasters[[i]], col = viridis(256), legend = TRUE, main = rasters_list_names[i])
+  
+  hist_plot <- ggplot(data.frame(x = getValues(rasters[[i]])), aes(x)) +
+    geom_histogram(bins = 30, fill = viridis(1), color = "white") +
+    theme_minimal() +
+    labs(x = "", y = "") +
+    theme(
+      plot.background = element_rect(fill = "white", color = NA),
+      panel.background = element_rect(fill = "white", color = NA)
+    )
+  
+  vp <- viewport(width = 0.3, height = 0.3, x = 0, y = 0, just = c("left", "bottom"))
+  print(hist_plot, vp = vp)
+  dev.off()
+  raster_plots[[i]] <- temp_file
+}
+
+slickR(raster_plots,height = "80vh",width = "90%")%synch%
+( slickR(rasters_list_names_interpretaciones, slideType = 'p'))+
+  settings(
+    dots = TRUE,adaptiveHeight = T
+  )
 ```
