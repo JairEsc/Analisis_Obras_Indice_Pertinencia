@@ -170,8 +170,8 @@ leaflet() |> addTiles(options = leaflet::tileOptions(opacity = 0.5)) |>
   ) |>
   # addMarkers(data=obras_sipdus_carretera_punto,group = "Obras_tipo_punto",
   #            label = obras_sipdus_carretera_punto$Obra) |>
-  addMarkers(data=obras_sipdus_carretera_multipunto,group = "Obras_tipo_multipunto",
-             label = obras_sipdus_carretera_multipunto$Obra) |>
+  addMarkers(data=obras_sipdus_carretera_punto,group = "Obras_tipo_multipunto",
+             label = obras_sipdus_carretera_punto$Obra) |>
   addLayersControl(overlayGroups = c("Accesibilidad",
                                      "Distancia centros de trabajo",
                                      "Distancia áreas naturales protegidas",
@@ -243,7 +243,7 @@ rasters_list_names_interpretaciones[[10]]=paste0(rasters_list_names_interpretaci
 #| message: false
 #| warning: false
 #| include: true
-#| out-height: "80vh"
+#| out-height: "90vh"
 #| out-width: "95vw"
 library(raster)
 library(viridis)
@@ -285,7 +285,7 @@ Podemos explorar algunas correlaciones entre los raster utilizados (da click a l
 #| echo: false
 #| message: false
 #| warning: false
-#| out-width: "100vw"
+#| out-width: "80vw"
 #| out-height: "80vh"
 library(ggcorrplot)
 
@@ -294,7 +294,7 @@ rasters_by_cells=rasters_by_cells |> as.data.frame()
 colnames(rasters_by_cells)=gsub("\n","",rasters_list_names)
 cormat <- round(cor(rasters_by_cells,use = "na"),2)
 #head(cormat)
-ggcorrplot(cormat,lab = T,type = "lower",show.diag = F,lab_size = 1)
+ggcorrplot(cormat,lab = T,type = "lower",show.diag = F,lab_size = 0.8)
 
 ```
 
