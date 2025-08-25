@@ -15,3 +15,4 @@ nivel_de_uso=mask(nivel_de_uso,municipios)
 leaflet() |> addTiles() |> addRasterImage(nivel_de_uso)
 
 nivel_de_uso|> writeRaster("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif")
+

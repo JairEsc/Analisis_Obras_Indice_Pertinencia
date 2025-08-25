@@ -2,7 +2,7 @@
 library(raster)
 library(sf)
 library(terra)
-
+source("Códigos/raster_base.R")
 rasters=list.files("Inputs/Drive/",pattern = ".tif$",full.names = T) |> lapply(raster::raster)
 rasters |> lapply(plot)
 
@@ -17,7 +17,7 @@ centros_trabajo_raster=mask(centros_trabajo_raster,municipios)
 centros_trabajo_raster |> values() |> hist()
 centros_trabajo_raster |> plot()
 
-#centros_trabajo_raster |> writeRaster("Inputs/Rasters_Generados_en_R/centros_trabajo_raster_distance.tif")
+centros_trabajo_raster |> writeRaster("Inputs/Rasters_Generados_en_R/centros_trabajo_raster_distance.tif",overwrite=T)
 ##
 shapes_list[2]
 
@@ -37,7 +37,7 @@ distancia_loc_marginadas_raster=mask(distancia_loc_marginadas_raster,municipios)
 distancia_loc_marginadas_raster |> values() |> hist()
 distancia_loc_marginadas_raster |> plot()
 
-#distancia_loc_marginadas_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_loc_marginadas_grados_alto_y_muy_alto_raster_distance.tif")
+distancia_loc_marginadas_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_loc_marginadas_grados_alto_y_muy_alto_raster_distance.tif",overwrite=T)
 ##
 shapes_list[3]
 
@@ -48,7 +48,7 @@ distancia_escuelas_raster=mask(distancia_escuelas_raster,municipios)
 distancia_escuelas_raster |> values() |> hist()
 distancia_escuelas_raster |> plot()
 
-#distancia_escuelas_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_escuelas_distance.tif")
+distancia_escuelas_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_escuelas_distance.tif",overwrite=T)
 
 ##
 shapes_list[4]
@@ -60,7 +60,7 @@ distancia_hospitales_raster=mask(distancia_hospitales_raster,municipios)
 distancia_hospitales_raster |> values() |> hist()
 distancia_hospitales_raster |> plot()
 
-#distancia_hospitales_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_hospitales_distance.tif")
+distancia_hospitales_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_hospitales_distance.tif",overwrite=T)
 
 ##
 shapes_list[11]
@@ -72,7 +72,7 @@ distancia_ZAP_raster=mask(distancia_ZAP_raster,municipios)
 distancia_ZAP_raster |> values() |> hist()
 distancia_ZAP_raster |> plot()
 
-#distancia_ZAP_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_ZAP_distance.tif")
+distancia_ZAP_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_ZAP_distance.tif",overwrite=T)
 
 
 ##
@@ -85,7 +85,7 @@ distancia_ANP_raster=mask(distancia_ANP_raster,municipios)
 distancia_ANP_raster |> values() |> hist()
 distancia_ANP_raster |> plot()
 
-#distancia_ANP_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_ANP_distance.tif")
+distancia_ANP_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_ANP_distance.tif",overwrite=T)
 ##
 shapes_list[11]
 ################En este bloque generamos los rasters de distancia a localidades con más bajo acceso a agua entubada y a drenaje sanitario.
