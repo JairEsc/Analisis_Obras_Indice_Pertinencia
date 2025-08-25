@@ -1,4 +1,4 @@
-
+library(raster)
 rasters_list=list.files("Inputs/Rasters_Generados_en_R/",pattern = ".tif",full.names = T) 
 rasters=rasters_list |> lapply(raster)
 rasters_list_names=c("Accesibilidad carretera a cabeceras municipales","
