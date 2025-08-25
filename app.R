@@ -1,11 +1,19 @@
 library(shiny)
 library(leaflet) # Necesario para el output del mapa
-
+library(terra)
+library(raster)
+library(sf)
+library(sp)
 source("Códigos/raster_base.R")
 #source("Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R")
 source("Códigos/leer_rasters_generados_en_r.R")
 #rsconnect::writeManifest()
-
+origin(rasters[[1]])=origin(rasters[[2]])
+extent(rasters[[1]])=extent(rasters[[2]])
+rasters[[8]]=min(rasters[[8]],rasters[[9]],na.rm = T)
+rasters=rasters[c(1:8,10)]
+rasters_list_names[8]='Distancia a localidades con bajo acceso a agua entubada o drenaje sanitario'
+rasters_list_names=rasters_list_names[c(1:8,10)]
 ui <- fluidPage(
   # Enlace a Tailwind CSS para un estilo moderno y responsivo
   tags$head(

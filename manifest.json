@@ -2625,16 +2625,13 @@
       "checksum": "7316e17687e4fdb8bd47dbfdcd9694c5"
     },
     "app.R": {
-      "checksum": "90ff03a6da28bd7d46140ee026635183"
-    },
-    "Códigos/app.R": {
-      "checksum": "90ff03a6da28bd7d46140ee026635183"
+      "checksum": "a068e5cccce740229a5ae44d16efeabc"
     },
     "Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R": {
       "checksum": "a19dcc9e55cd9a891c2c801711a96b4e"
     },
     "Códigos/leer_rasters_generados_en_r.R": {
-      "checksum": "0ae617ad3455fb7c9d6a30694971bf29"
+      "checksum": "87a96b63ebd7129664ce666ffe0f88af"
     },
     "Códigos/nivel_de_uso_to_raster.R": {
       "checksum": "40fc8070ad02385b376e3ad4f5c2b12d"
@@ -2643,7 +2640,7 @@
       "checksum": "bf634ab6d43e67d6618309dfd1bfcc2e"
     },
     "Códigos/raster_base.R": {
-      "checksum": "b43b87838898849369ab6e1ac2e66e04"
+      "checksum": "4bac38d6727e639d6c69e75e9088a379"
     },
     "Códigos/render_html.R": {
       "checksum": "7df5bc60a064f35acf7715802e5af781"
@@ -3214,6 +3211,21 @@
     },
     "Inputs/Drive/vivienda raster drenaje.tif": {
       "checksum": "0f30b3ba0dd10f27aee0b1a971becdab"
+    },
+    "Inputs/LIM_MUNICIPALES.dbf": {
+      "checksum": "6dca1ab910e1d70addd6fe72675f44ef"
+    },
+    "Inputs/LIM_MUNICIPALES.prj": {
+      "checksum": "07a7cb0063624e15e67aad3dde6caa3a"
+    },
+    "Inputs/LIM_MUNICIPALES.shp": {
+      "checksum": "0e6b8f432317d02e65d5bb62b09b9f43"
+    },
+    "Inputs/LIM_MUNICIPALES.shx": {
+      "checksum": "42356c9d942c049752bf9c8822f7ad26"
+    },
+    "Inputs/municipiosjair.cpg": {
+      "checksum": "ae3b3df9970b49b6523e608759bc957d"
     },
     "Inputs/Nivel de uso/rutas_con_numero_de_usos_citydata.geojson": {
       "checksum": "2d6c7bd92e7977d25a0079907312c2ab"
