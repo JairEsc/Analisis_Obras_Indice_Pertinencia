@@ -20,6 +20,23 @@ weights=c(9,3,0,0,5,8,7,0,1)
 weights=weights/sum(weights)
 weights[1]=-weights[1]
 weights=-weights
+for(i in 1:length(rasters)){
+  raster_vals <- values(rasters[[i]])
+  raster_vals <- raster_vals[!is.na(raster_vals)]
+  
+  q1 <- quantile(raster_vals, 0.25)
+  q3 <- quantile(raster_vals, 0.75)
+  iqr <- q3 - q1
+  
+  upper_limit <- q3 + 1.5 * iqr
+  lower_limit <- q1 - 1.5 * iqr
+  
+  rasters[[i]] <- clamp(rasters[[i]], 
+                        lower = lower_limit, 
+                        upper = upper_limit, 
+                        useValues=TRUE)
+}
+rasters=rasters |> lapply(scale)
 ui <- fluidPage(
   # Enlace a Tailwind CSS para un estilo moderno y responsivo
   tags$head(
@@ -124,28 +141,8 @@ ui <- fluidPage(
   )
 )
 server <- function(input, output, session) {
-  # Asegúrate de que tu lista 'rasters' esté disponible en el entorno global
-  # o se cargue aquí antes de ser referenciada.
-  # Por ejemplo, si 'rasters' es un objeto global, no necesitas cargarlo aquí.
-  # Si necesitas cargarlo, descomenta y ajusta esta sección:
-  # rasters_global <- list()
-  # for (i in 1:9) {
-  #   r <- raster(ncols=50, nrows=50, xmn=-120, xmx=-80, ymn=15, ymx=35)
-  #   values(r) <- runif(ncell(r), min = -1, max = 1)
-  #   rasters_global[[i]] <- r
-  # }
-  
-  rasters_reactive <- reactive({
-    # Aquí se asume que 'rasters' es un objeto global o ya cargado
-    # que contiene tu lista de 9 objetos raster.
-    # Si 'rasters' no está definido en este scope, esto causará un error.
-    # Podrías querer renombrar tu lista global si hay un conflicto de nombres.
-    return(rasters) 
-  })
-  
   dummy_raster_data <- eventReactive(input$generate_map_button, {
-    req(rasters_reactive())
-    current_rasters <- rasters_reactive() |> sapply(scale)
+    current_rasters <- rasters
     
     # Verifica que 'current_rasters' tenga exactamente 9 elementos
     if (length(current_rasters) != 9) {
@@ -156,39 +153,49 @@ server <- function(input, output, session) {
     for (i in 1:9) {
       weights[i] <- input[[paste0("raster_weight_", i)]]
     }
-    
-    combined_raster <- current_rasters[[1]]*weights[1]+current_rasters[[2]]*weights[2]+
-      current_rasters[[3]]*weights[3]+current_rasters[[4]]*weights[4]+
-      current_rasters[[5]]*weights[5]+current_rasters[[6]]*weights[6]+
-      current_rasters[[7]]*weights[7]+current_rasters[[8]]*weights[8]+
-      current_rasters[[9]]*weights[9]
-    return(combined_raster)
+    print("Haciendo la suma")
+    combined_raster <- Reduce(`+`, Map(`*`, current_rasters, weights))
+    print("suma lista")
+    return(combined_raster |>aggregate( fact = 2, fun = "mean"))
   })
   
   output$result_map <- renderLeaflet({
-    req(dummy_raster_data())
-    ##Ya que tenemos el raster. Hacemos extract por promedio a las obras, las agregamos como shape y mostramos una card 
-    #Con los resultados. 
-    
+    # The initial leaflet map is rendered here without the raster image.
     leaflet() %>%
       addTiles() %>%
-      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8,group = "Pertinencia") %>%
-      addLegend(pal = colorNumeric("Spectral", values(dummy_raster_data()), na.color = "transparent"),
-                values = values(dummy_raster_data()),
-                title = "Pertinencia") |> 
-      addPolylines(data = lineas_c_extract, label = lineas_labels,group='Obras (líneas)') |>
-      addMarkers(data = puntos_c_extract, label = puntos_labels,group='Obras (puntos)') |> 
-      addLayersControl(overlayGroups = c("Pertinencia",'Obras (líneas)','Obras (puntos)')) |> 
-      htmlwidgets::onRender(
-    "function(el, x) {
-      this.getPane('tooltipPane').style.maxWidth = '800px';
-      var style = document.createElement('style');
-      style.innerHTML = '.leaflet-tooltip { max-width: 800px; white-space: normal; }';
-      document.head.appendChild(style);
-    }"
-  )
+      addPolylines(data = lineas_c_extract, label = lineas_labels, group = 'Obras (líneas)',
+                   ) %>%
+      addMarkers(data = puntos_c_extract, label = puntos_labels, group = 'Obras (puntos)'
+                 ) %>%
+      addLayersControl(overlayGroups = c("Pertinencia", 'Obras (líneas)', 'Obras (puntos)'
+                                         )) 
+    # %>%
+    #   htmlwidgets::onRender(
+    #     "function(el, x) {
+    #       this.getPane('tooltipPane').style.maxWidth = '800px';
+    #       var style = document.createElement('style');
+    #       style.innerHTML = '.leaflet-tooltip { max-width: 800px; white-space: normal; }';
+    #       document.head.appendChild(style);
+    #     }"
+    #   )
   })
-} 
+  
+  observeEvent(input$generate_map_button, {
+    req(dummy_raster_data())
+    
+    # This observeEvent handles clearing and redrawing the raster
+    # and legend only when the button is clicked.
+    print("Haciendo el dibujo")
+    leafletProxy("result_map") %>%
+      clearImages() %>%
+      clearControls() %>%
+      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8, group = "Pertinencia") %>%
+      addLegend(pal = colorNumeric("Spectral", 1:100, na.color = "transparent"),
+                values = 1:100,
+                title = "Pertinencia",labels = "")
+    print("dibujo listo")
+  })
+}
 
 shinyApp(ui, server)
 
