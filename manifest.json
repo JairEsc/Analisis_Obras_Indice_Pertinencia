@@ -2029,6 +2029,32 @@
         "Built": "R 4.5.0; ; 2025-04-10 01:57:23 UTC; windows"
       }
     },
+    "shinybusy": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "shinybusy",
+        "Title": "Busy Indicators and Notifications for 'Shiny' Applications",
+        "Version": "0.3.3",
+        "Authors@R": "c(person(\"Fanny\", \"Meyer\", role = \"aut\"),\n  person(\"Victor\", \"Perrier\", email = \"victor.perrier@dreamrs.fr\", role = c(\"aut\", \"cre\")),\n  person(\"Silex Technologies\", comment = \"https://www.silex-ip.com\", role = \"fnd\"))",
+        "Description": "Add indicators (spinner, progress bar, gif) in your 'shiny'\n  applications to show the user that the server is busy. And other tools to let\n  your users know something is happening (send notifications, reports, ...).",
+        "License": "GPL-3",
+        "Encoding": "UTF-8",
+        "Imports": "htmltools, shiny, jsonlite, htmlwidgets",
+        "RoxygenNote": "7.3.1",
+        "URL": "https://github.com/dreamRs/shinybusy,\nhttps://dreamrs.github.io/shinybusy/",
+        "BugReports": "https://github.com/dreamRs/shinybusy/issues",
+        "Suggests": "testthat, covr, knitr, rmarkdown",
+        "VignetteBuilder": "knitr",
+        "NeedsCompilation": "no",
+        "Packaged": "2024-03-09 10:44:38 UTC; perri",
+        "Author": "Fanny Meyer [aut],\n  Victor Perrier [aut, cre],\n  Silex Technologies [fnd] (https://www.silex-ip.com)",
+        "Maintainer": "Victor Perrier <victor.perrier@dreamrs.fr>",
+        "Repository": "CRAN",
+        "Date/Publication": "2024-03-09 11:20:02 UTC",
+        "Built": "R 4.5.1; ; 2025-08-20 02:30:12 UTC; windows"
+      }
+    },
     "slickR": {
       "Source": "github",
       "Repository": null,
@@ -2625,10 +2651,13 @@
       "checksum": "7316e17687e4fdb8bd47dbfdcd9694c5"
     },
     "app.R": {
-      "checksum": "a068e5cccce740229a5ae44d16efeabc"
+      "checksum": "6e856561d7d0e8b9ebfb67c60e15a07f"
+    },
+    "Códigos/leer_geojsons_c_extract.R": {
+      "checksum": "4eac1f6ff5edf93d1a8cdb298dfd2be2"
     },
     "Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R": {
-      "checksum": "a19dcc9e55cd9a891c2c801711a96b4e"
+      "checksum": "2e4b85b550b445d623adceb4f7af5a1f"
     },
     "Códigos/leer_rasters_generados_en_r.R": {
       "checksum": "87a96b63ebd7129664ce666ffe0f88af"
@@ -2649,13 +2678,13 @@
       "checksum": "3b54547559d1b2f7aa09714087e4f939"
     },
     "Documentacion_Analisis_obras_indice_pertinencia.html": {
-      "checksum": "569efb706101e19baa3d486e8eb8f6f9"
+      "checksum": "24dfcbe7a4678105f7497b59dc5c5acb"
     },
     "Documentacion_Analisis_obras_indice_pertinencia.qmd": {
-      "checksum": "6acb3a0108599ce988c2849de65c61ed"
+      "checksum": "f3d06d90c2812315781cff29841290c5"
     },
     "Documentacion_Analisis_obras_indice_pertinencia_files/figure-html/unnamed-chunk-10-1.png": {
-      "checksum": "7b3bf6f9a618c8b70f19a497eb47b94b"
+      "checksum": "dc65fa63fedcd33163a3d4e2c6677a01"
     },
     "Documentacion_Analisis_obras_indice_pertinencia_files/figure-html/unnamed-chunk-10-2.png": {
       "checksum": "af5dd6882100376f98965ed1cf3b859f"
@@ -2779,6 +2808,15 @@
     },
     "Documentacion_Analisis_obras_indice_pertinencia_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js": {
       "checksum": "4c72a5a790e066510f9eb68541280646"
+    },
+    "Documentacion_Analisis_obras_indice_pertinencia_files/libs/quarto-contrib/glightbox/glightbox.min.css": {
+      "checksum": "9b438b29cef1c212d1c65a877ffc7232"
+    },
+    "Documentacion_Analisis_obras_indice_pertinencia_files/libs/quarto-contrib/glightbox/glightbox.min.js": {
+      "checksum": "2b4c8cbaade24ecb58bcb0d89694ccee"
+    },
+    "Documentacion_Analisis_obras_indice_pertinencia_files/libs/quarto-contrib/glightbox/lightbox.css": {
+      "checksum": "aeee60b3000dd0cfd24fea7e4a62aee7"
     },
     "Documentacion_Analisis_obras_indice_pertinencia_files/libs/quarto-html/anchor.min.js": {
       "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
@@ -3254,6 +3292,18 @@
     "Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif": {
       "checksum": "ad8c0a5259ef73e4850175da50aee9bc"
     },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_linea.geojson": {
+      "checksum": "2ee2a66e2d187bee4c6a950ae5075efd"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_linea_extract.geojson": {
+      "checksum": "32596470974a583b2bd41114ab99f797"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_punto_extract.geojson": {
+      "checksum": "675d6ad1ef5a88831a0581d98103b7b2"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/pertinencia_default.tif": {
+      "checksum": "3509f2cb3ea23e6a998f88b4fa4eb9a4"
+    },
     "Inputs/Rasters_Generados_en_R/porc_viv_sin_acceso_agua_entubada_VIV18_R_buffer200m_a_loc_rurales.tif": {
       "checksum": "2c5f64c1a454e0969afde3632da02c66"
     },
@@ -3289,6 +3339,9 @@
     },
     "Inputs/Secciones/Originales/pp_ayuntamiento_seccion.shx": {
       "checksum": "57eef1f061e2f876e068673a8e160bd3"
+    },
+    "references.bib": {
+      "checksum": "9d06076783b6f94a17cee079513da0f0"
     }
   },
   "users": null

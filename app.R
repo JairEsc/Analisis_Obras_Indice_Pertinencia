@@ -1,11 +1,13 @@
 library(shiny)
+library(shinybusy)
 library(leaflet) # Necesario para el output del mapa
 library(terra)
 library(raster)
 library(sf)
 library(sp)
+
 source("Códigos/raster_base.R")
-#source("Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R")
+source("Códigos/leer_geojsons_c_extract.R")
 source("Códigos/leer_rasters_generados_en_r.R")
 #rsconnect::writeManifest()
 origin(rasters[[1]])=origin(rasters[[2]])
@@ -14,7 +16,7 @@ rasters[[8]]=min(rasters[[8]],rasters[[9]],na.rm = T)
 rasters=rasters[c(1:8,10)]
 rasters_list_names[8]='Distancia a localidades con bajo acceso a agua entubada o drenaje sanitario'
 rasters_list_names=rasters_list_names[c(1:8,10)]
-weights=c(9,3,2,4,5,8,7,6,1)
+weights=c(9,3,0,0,5,8,7,0,1)
 weights=weights/sum(weights)
 weights[1]=-weights[1]
 weights=-weights
@@ -115,7 +117,8 @@ ui <- fluidPage(
           div(class = "lg:col-span-2 panel flex flex-col items-center justify-center min-h-[500px]",
               h2(class = "text-2xl font-semibold mb-4 text-gray-800", "Índice de pertinencia"),
               # Placeholder para el mapa Leaflet
-              leafletOutput("result_map", height = "600px")
+              leafletOutput("result_map", height = "600px"),
+              add_busy_spinner(spin = "cube-grid")
           )
       )
   )
@@ -164,12 +167,26 @@ server <- function(input, output, session) {
   
   output$result_map <- renderLeaflet({
     req(dummy_raster_data())
+    ##Ya que tenemos el raster. Hacemos extract por promedio a las obras, las agregamos como shape y mostramos una card 
+    #Con los resultados. 
+    
     leaflet() %>%
       addTiles() %>%
-      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8) %>%
+      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8,group = "Pertinencia") %>%
       addLegend(pal = colorNumeric("Spectral", values(dummy_raster_data()), na.color = "transparent"),
                 values = values(dummy_raster_data()),
-                title = "Pertinencia")
+                title = "Pertinencia") |> 
+      addPolylines(data = lineas_c_extract, label = lineas_labels,group='Obras (líneas)') |>
+      addMarkers(data = puntos_c_extract, label = puntos_labels,group='Obras (puntos)') |> 
+      addLayersControl(overlayGroups = c("Pertinencia",'Obras (líneas)','Obras (puntos)')) |> 
+      htmlwidgets::onRender(
+    "function(el, x) {
+      this.getPane('tooltipPane').style.maxWidth = '800px';
+      var style = document.createElement('style');
+      style.innerHTML = '.leaflet-tooltip { max-width: 800px; white-space: normal; }';
+      document.head.appendChild(style);
+    }"
+  )
   })
 } 
 

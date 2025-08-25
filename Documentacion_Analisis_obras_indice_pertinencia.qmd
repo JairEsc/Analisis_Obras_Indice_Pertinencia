@@ -6,31 +6,38 @@ format:
   html:
     page-layout: full
 editor: visual
+bibliography: references.bib  
 ---
 
 ## Lista de consideraciones
 
--   Accesibilidad carretera a cabeceras municipales
+-   Accesibilidad carretera a cabeceras municipales (@hickman2024rural)
 
--   Distancia a Escuelas
+    -   Pendiente
 
--   Distancia a Centros de Trabajo
+    -   Uso de suelo
 
--   Distancia a Hospitales
+    -   Red vial y velocidades máximas permitidas
+
+-   Distancia a Escuelas (@meena2023evaluation)
+
+-   Distancia a Centros de Trabajo (@duran2014road)
+
+-   Distancia a Hospitales (@lopes2021mcda)
 
 -   Áreas Naturales Protegidas (Distancia)
 
--   Zonas Prioritarias (Distancia)
+-   Zonas Prioritarias (Distancia) (@brichetti2021infrastructure)
 
 -   Secciones Electorales (Prioritarias)
 
 -   Nivel de uso
 
--   Distancia a localidades Marginadas (Alta y Muy alta)
+-   Distancia a localidades Marginadas (Alta y Muy alta) (@brocker2010assessing)
 
--   Distancia a localidades con bajo acceso a agua entubada
+-   Distancia a localidades con bajo acceso a agua entubada (@nicoletti2023disadvantaged)
 
--   Distancia a localidades con bajo acceso a drenaje sanitario
+-   Distancia a localidades con bajo acceso a drenaje sanitario (@nicoletti2023disadvantaged)
 
 ## Preprocesamiento y exploración
 
@@ -183,6 +190,7 @@ datatable(obras_sipdus_carretera |>
             st_drop_geometry() |> 
             dplyr::rename(Habitantes_beneficiados=Habitantes.beneficiados), 
           options = list(
+            pageLength = 5,
             rownames = FALSE,
             columnDefs = list(list(width = '400px', targets = c(7))),
             scrollX = TRUE,
@@ -235,6 +243,8 @@ rasters_list_names_interpretaciones[[10]]=paste0(rasters_list_names_interpretaci
 #| message: false
 #| warning: false
 #| include: true
+#| out-height: "80vh"
+#| out-width: "95vw"
 library(raster)
 library(viridis)
 library(htmlwidgets)
@@ -244,7 +254,7 @@ library(ggplot2)
 raster_plots <- list()
 for (i in 1:length(rasters)){
   temp_file <- tempfile(fileext = ".png")
-  png(temp_file, width = 600, height = 400)
+  png(temp_file)
   plot(rasters[[i]], col = viridis(256), legend = TRUE, main = rasters_list_names[i])
   
   hist_plot <- ggplot(data.frame(x = getValues(rasters[[i]])), aes(x)) +
@@ -269,10 +279,14 @@ slickR(raster_plots,height = "80vh",width = "90%")%synch%
   )
 ```
 
-Podemos explorar algunas correlaciones entre los raster utilizados
+Podemos explorar algunas correlaciones entre los raster utilizados (da click a la imagen para ampliar)
 
 ```{r}
 #| echo: false
+#| message: false
+#| warning: false
+#| out-width: "100vw"
+#| out-height: "80vh"
 library(ggcorrplot)
 
 rasters_by_cells <- rasters |> lapply(getValues)
@@ -280,7 +294,7 @@ rasters_by_cells=rasters_by_cells |> as.data.frame()
 colnames(rasters_by_cells)=gsub("\n","",rasters_list_names)
 cormat <- round(cor(rasters_by_cells,use = "na"),2)
 #head(cormat)
-ggcorrplot(cormat,lab = T)
+ggcorrplot(cormat,lab = T,type = "lower",show.diag = F,lab_size = 1)
 
 ```
 
@@ -323,24 +337,20 @@ Para la definición de la pertinencia de una obra ya existente se considerarán 
 
 ```{r}
 #| echo: false
-#| output: asis
 
 ###Agregarlos en un div con display flex.
-div(
-  style = "display: flex;",
-  div(
-    style = "width: 47.5%;",
-    plot(rasters[[1]],
-         col = viridis(256),
-         legend = TRUE,main=rasters_list_names[1])
-  ),
-  div(
-    style = "width: 47.5%;padding-left:5%",
-    plot("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif" |> raster(),
-         col = viridis(256),
-         legend = TRUE,main="Nivel de uso")
-  )
-)
+
+par(mfrow=c(1,2))
+
+plot(rasters[[1]],
+col = viridis(256),
+legend = TRUE,main=rasters_list_names[1])
+ 
+plot("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif" |> raster(),
+col = viridis(256),
+legend = TRUE,main="Nivel de uso")
+
+par(mfrow=c(1,1))
 ```
 
 ## Construcción
@@ -490,12 +500,12 @@ current_rasters= current_rasters|> sapply(scale,simplify = T,USE.NAMES = F)
 leaflet() |> addTiles() |> addRasterImage(z_sum)|> addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Valores de rasters', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = '',tickLength = 0) 
 ```
 
-## Mejoramiento
-
-Pendiente
-
 ```{r}
 #| include: false
+# 
+# Mejoramiento
+# 
+# Pendiente
 div(
   style = "display: flex;",
   div(
@@ -508,3 +518,5 @@ div(
   )
 )
 ```
+
+## Referencias
