@@ -1,5 +1,6 @@
 ---
 title: "Documentación Análisis de Pertinencia de Obras Carreteras"
+lightbox: true
 author: "Jair"
 format: 
   html:
@@ -322,18 +323,19 @@ Para la definición de la pertinencia de una obra ya existente se considerarán 
 
 ```{r}
 #| echo: false
+#| output: asis
 
 ###Agregarlos en un div con display flex.
 div(
   style = "display: flex;",
   div(
-    style = "width: 45%;",
+    style = "width: 47.5%;",
     plot(rasters[[1]],
          col = viridis(256),
          legend = TRUE,main=rasters_list_names[1])
   ),
   div(
-    style = "width: 45%;padding-left:5%",
+    style = "width: 47.5%;padding-left:5%",
     plot("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif" |> raster(),
          col = viridis(256),
          legend = TRUE,main="Nivel de uso")
@@ -490,9 +492,10 @@ leaflet() |> addTiles() |> addRasterImage(z_sum)|> addLegendNumeric( pal = color
 
 ## Mejoramiento
 
-La superposición de las capas "Accesibilidad" y "Nivel de uso" puede parecer redundante
+Pendiente
 
 ```{r}
+#| include: false
 div(
   style = "display: flex;",
   div(

@@ -14,6 +14,10 @@ rasters[[8]]=min(rasters[[8]],rasters[[9]],na.rm = T)
 rasters=rasters[c(1:8,10)]
 rasters_list_names[8]='Distancia a localidades con bajo acceso a agua entubada o drenaje sanitario'
 rasters_list_names=rasters_list_names[c(1:8,10)]
+weights=c(9,3,2,4,5,8,7,6,1)
+weights=weights/sum(weights)
+weights[1]=-weights[1]
+weights=-weights
 ui <- fluidPage(
   # Enlace a Tailwind CSS para un estilo moderno y responsivo
   tags$head(
@@ -90,7 +94,7 @@ ui <- fluidPage(
                       label = NULL, # El label se maneja con el 'p' de arriba
                       min = -1,
                       max = 1,
-                      value = 0,
+                      value = weights[i],
                       step = 0.01,
                       width = "100%"
                     )
