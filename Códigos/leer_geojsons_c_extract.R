@@ -6,7 +6,7 @@ st_read("Inputs/Rasters_Generados_en_R/Otros/obras_punto_extract.geojson")|> st_
 
 lineas_labels <- lapply(1:nrow(lineas_c_extract), function(i) {
   obra <- lineas_c_extract$Obra[i]
-  inversion <- ifelse(!is.na(puntos_c_extract$Inversión[i]),paste0("$",formatC(puntos_c_extract$Inversión[i], big.mark = ",",format = "d")),"-")
+  inversion <- ifelse(!is.na(lineas_c_extract$Inversión[i]),paste0("$",formatC(lineas_c_extract$Inversión[i], big.mark = ",",format = "d")),"-")
   pertinencia <- round(lineas_c_extract$extract[i], 2)
   # Dividir el texto en un vector de palabras
   obra_words <- unlist(strsplit(obra, split = " "))

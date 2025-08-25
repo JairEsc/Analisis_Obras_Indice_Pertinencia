@@ -153,10 +153,10 @@ server <- function(input, output, session) {
     for (i in 1:9) {
       weights[i] <- input[[paste0("raster_weight_", i)]]
     }
-    print("Haciendo la suma")
+    #print("Haciendo la suma")
     combined_raster <- Reduce(`+`, Map(`*`, current_rasters, weights))
-    print("suma lista")
-    return(combined_raster |>aggregate( fact = 2, fun = "mean"))
+    #print("suma lista")
+    return(combined_raster |>aggregate( fact = 3, fun = "mean"))
   })
   
   output$result_map <- renderLeaflet({
@@ -185,15 +185,13 @@ server <- function(input, output, session) {
     
     # This observeEvent handles clearing and redrawing the raster
     # and legend only when the button is clicked.
-    print("Haciendo el dibujo")
+    #print("Haciendo el dibujo")
     leafletProxy("result_map") %>%
       clearImages() %>%
       clearControls() %>%
       addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8, group = "Pertinencia") %>%
-      addLegend(pal = colorNumeric("Spectral", 1:100, na.color = "transparent"),
-                values = 1:100,
-                title = "Pertinencia",labels = "")
-    print("dibujo listo")
+      addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Pertinencia', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = c('Baja', "Alta"),tickLength = 0) 
+    #print("dibujo listo")
   })
 }
 
