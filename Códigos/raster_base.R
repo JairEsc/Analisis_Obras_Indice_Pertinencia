@@ -2,7 +2,7 @@
 
 library(terra)
 library(sf)
-read_sf("../../Reutilizables/Cartografia/LIM_MUNICIPALES.shp") |> st_transform(st_crs("EPSG:32614"))->municipios
+read_sf("Inputs/LIM_MUNICIPALES.shp") |> st_transform(st_crs("EPSG:32614"))->municipios
 
 extent_hidalgo<- st_bbox(municipios)
 

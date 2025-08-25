@@ -2,7 +2,7 @@ library(shiny)
 library(leaflet) # Necesario para el output del mapa
 
 source("Códigos/raster_base.R")
-source("Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R")
+#source("Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R")
 source("Códigos/leer_rasters_generados_en_r.R")
 #rsconnect::writeManifest()
 
