@@ -3,7 +3,7 @@ library(sf)
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_linea_extract.geojson") |> st_transform(st_crs("EPSG:4326"))->lineas_c_extract
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_punto_extract.geojson")|> st_transform(st_crs("EPSG:4326"))->puntos_c_extract
 
-
+lineas_c_extract$extract[lineas_c_extract$extract |> is.na()]=0
 lineas_labels <- lapply(1:nrow(lineas_c_extract), function(i) {
   obra <- lineas_c_extract$Obra[i]
   inversion <- ifelse(!is.na(lineas_c_extract$Inversión[i]),paste0("$",formatC(lineas_c_extract$Inversión[i], big.mark = ",",format = "d")),"-")
@@ -23,9 +23,6 @@ lineas_labels <- lapply(1:nrow(lineas_c_extract), function(i) {
     linea <- paste(palabras_bloque, collapse = " ")
     obra_2 <- paste0(obra_2, linea, "<br>")
   }
-  
-  inversion <- ifelse(!is.na(puntos_c_extract$Inversión[i]), paste0("$", formatC(puntos_c_extract$Inversión[i], big.mark = ",", format = "d")), "-")
-  pertinencia <- round(puntos_c_extract$extract[i], 2)
   
   htmltools::HTML(paste0("<b>Obra:</b> ", obra_2,
                          "<b>Inversión:</b> ", inversion, "<br>",

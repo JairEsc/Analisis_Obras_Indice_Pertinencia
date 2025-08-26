@@ -1,0 +1,73 @@
+---
+title: "Exploración encuesta de precepción"
+lightbox: true
+author: "Jair"
+format: 
+  html:
+    page-layout: full
+editor: visual
+---
+
+## Encuesta de percepción de aprobación
+
+Utilizamos los datos de 2025 con las siguientes preguntas
+
+-   Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo.
+-   Y...cuál.considera.que.es.el.principal.problema.en.su.colonia."\
+-   X.Ha.mejorado..se.ha.quedado.igual.o.ha.empeorado..Instalaciones.de.planteles.educativos."\
+-   X.Ha.mejorado..se.ha.quedado.igual.o.ha.empeorado..Equipamiento.en.aulas."\
+-   En.el.último.año...usted.se.vio.afectado.a.por.Falta.de.suministro.de.agua.en.la.vivienda."\
+-   En.el.último.año...usted.se.vio.afectado.a.por.Invertir.mucho.tiempo.en.traslados.por.falta.de.carreteras."\
+-   En.el.último.año...usted.se.vio.afectado.a.por.Caminos.sin.posibilidad.de.lograr.velocidad.por.estar.en.mal.estado."\
+-   En.el.último.año...usted.se.vio.afectado.a.por.Falta.de.parques..jardines.o.lugares.de.esparcimiento.cerca.de.su.vivienda."
+-   En.el.último.año...usted.se.vio.afectado.a.por.Deterioro.de.calles.y.avenidas.por.falta.de.mantenimiento."\
+-   SALUD...En.el.último.año...usted.se.vio.afectado.a.por.Mal.equipamiento.en.las.instalaciones."
+
+## Agrupamiento por temáticas
+
+Únicamente las preguntas *"Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo"* y *"Y...cuál.considera.que.es.el.principal.problema.en.su.colonia."* tienen múltiples respuestas.
+
+Por lo anterior, se consideran las posibles respuestas para su clasificación junto a otras preguntas de la misma temática.
+
+### Educación 
+
+-   X.Ha.mejorado..se.ha.quedado.igual.o.ha.empeorado..Instalaciones.de.planteles.educativos.
+
+-   X.Ha.mejorado..se.ha.quedado.igual.o.ha.empeorado..Equipamiento.en.aulas.
+
+Ambas preguntas se responden "Sí" o "No", por lo que para cada una, se filtra la encuesta según su respuesta y se calcula un kernel de densidad gaussiana
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+library(raster)
+library(terra)
+library(sf)
+
+source("Códigos/encuesta_leer_y_funcion_kernel_densidad.R")
+par(mfrow=c(2,2))
+lista_rasters_educacion=list()
+lista_rasters_educacion[["Planteles_mejor"]]=filtrar_dada_pregunta_y_boolean(5,T)
+lista_rasters_educacion[["Planteles_mejor"]]|> plot(main='Mejora en planteles educativos')
+lista_rasters_educacion[["Equipamiento_aulas_mejor"]]=filtrar_dada_pregunta_y_boolean(6,T)
+lista_rasters_educacion[["Equipamiento_aulas_mejor"]]|> plot(main='Mejora en equipamiento de aulas')
+lista_rasters_educacion[["Planteles_peor"]]=filtrar_dada_pregunta_y_boolean(5,F)
+lista_rasters_educacion[["Planteles_peor"]]|> plot(main='Empeorado en planteles educativos')
+lista_rasters_educacion[["Equipamiento_aulas_peor"]]=filtrar_dada_pregunta_y_boolean(6,F)
+lista_rasters_educacion[["Equipamiento_aulas_peor"]]|> plot(main='Empeorado en equipamiento de aulas')
+```
+
+Además, agregamos la matriz de correlación entre los rasters del mismo tema
+
+```{r}
+#| echo: false
+library(ggcorrplot)
+library(raster)
+rasters_by_cells <- lista_rasters_educacion |> lapply(values)
+rasters_by_cells=rasters_by_cells |> as.data.frame()
+colnames(rasters_by_cells)=gsub("\n","",names(lista_rasters_educacion))
+cormat <- round(cor(rasters_by_cells,use = "na"),2)
+#head(cormat)
+ggcorrplot(cormat,lab = T,type = "lower",show.diag = F)
+```

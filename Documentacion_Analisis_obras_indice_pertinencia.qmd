@@ -187,7 +187,7 @@ leaflet() |> addTiles(options = leaflet::tileOptions(opacity = 0.5)) |>
 library(DT)
 datatable(obras_sipdus_carretera |> 
             dplyr::select(ID_OBRA, Municipio, Rubro, Ejercicio, Inversión, Habitantes.beneficiados, Ejecutora, Obra) |> 
-            st_drop_geometry() |> 
+            st_drop_geometry()|>dplyr::rename(`Obra (breve Descripción)`=Obra) |> 
             dplyr::rename(Habitantes_beneficiados=Habitantes.beneficiados), 
           options = list(
             pageLength = 5,

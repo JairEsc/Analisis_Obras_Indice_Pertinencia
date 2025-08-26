@@ -12,7 +12,7 @@ shapes_list=list.files("Inputs/Drive/VIABILIDAD DE OBRAS/",pattern = ".shp$",ful
 
 shapes_list[1]
 
-centros_trabajo_raster=terra::distance(base, shapes[[1]]) 
+centros_trabajo_raster=terra::distance(base, shapes[[1]])
 centros_trabajo_raster=mask(centros_trabajo_raster,municipios)
 centros_trabajo_raster |> values() |> hist()
 centros_trabajo_raster |> plot()
@@ -62,19 +62,23 @@ distancia_hospitales_raster |> plot()
 
 distancia_hospitales_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_hospitales_distance.tif",overwrite=T)
 
-##
-shapes_list[11]
 
 
-
-distancia_ZAP_raster=terra::distance(base, shapes[[11]]) 
+distancia_ZAP_raster=terra::distance(base, shapes[[12]]) 
 distancia_ZAP_raster=mask(distancia_ZAP_raster,municipios)
 distancia_ZAP_raster |> values() |> hist()
 distancia_ZAP_raster |> plot()
 
 distancia_ZAP_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_ZAP_distance.tif",overwrite=T)
+(("Inputs/Rasters_Generados_en_R/distancia_ZAP_distance.tif" |> raster())+1)|> log()|> writeRaster("Inputs/Rasters_Generados_en_R/distancia_ZAP_distance.tif",overwrite=T)
+##
+shapes[[12]] |> vect() |> rasterize(base,field = "ZAP", fun = "mean")->z
+z[z |> is.na()]=0
+par(mfrow=c(1,1))
+plot(z*base,col=viridis(256),main='Binario',legend=F)
+library(viridis)
 
-
+(("Inputs/Rasters_Generados_en_R/distancia_ZAP_distance.tif" |> raster())+1)|> log() |> plot(col=viridis(256),main='Distancia',legend=F)
 ##
 shapes_list[1]
 
@@ -86,10 +90,17 @@ distancia_ANP_raster |> values() |> hist()
 distancia_ANP_raster |> plot()
 
 distancia_ANP_raster |> writeRaster("Inputs/Rasters_Generados_en_R/distancia_ANP_distance.tif",overwrite=T)
+
 ##
 shapes_list[11]
 ################En este bloque generamos los rasters de distancia a localidades con más bajo acceso a agua entubada y a drenaje sanitario.
-
+library(leaflet)
+leaflet() |> addTiles() |> addRasterImage(z*base ) |> 
+  addMarkers(data=puntos_c_extract) |> 
+  addPolylines(data=lineas_c_extract)
+leaflet() |> addTiles() |> addRasterImage((("Inputs/Rasters_Generados_en_R/distancia_ZAP_distance.tif" |> raster())+1)|> log() ) |> 
+  addMarkers(data=puntos_c_extract) |> 
+  addPolylines(data=lineas_c_extract)
 #Leemos poligonos
 viviendas_s_acceso_agua_urb=read_sf("../../Reutilizables/Demograficos/scince/loc_urb.shp") |> 
   st_transform(st_crs(municipios)) |> 
