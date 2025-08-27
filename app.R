@@ -71,7 +71,8 @@ rasters[[9]][rasters[[9]] |> is.na()]=mean(values(rasters[[9]]) ,na.rm=T)
 rasters[[9]]=rasters[[9]] |> terra::mask(municipios)
 rasters[[10]]=z_lista[[1]]
 rasters_list_names[[10]]="Percepción infraestructura vial"
-
+rasters=rasters|> lapply(\(x){x 
+  aggregate(x, fact = 3, fun = "mean")})
 ###UI
 descripciones_minimas=c(
   "Se mide en distancia. Mayor valor significa más pertinente la obra",
@@ -217,19 +218,19 @@ server <- function(input, output, session) {
     print(weights)
     print("Haciendo la suma")
     combined_raster = 
-      current_rasters[[1]]*weights[1]+
-      current_rasters[[2]]*weights[2]+
-      current_rasters[[3]]*weights[3]+
-      current_rasters[[4]]*weights[4]+
-      current_rasters[[5]]*weights[5]+
-      current_rasters[[6]]*weights[6]+
-      current_rasters[[7]]*weights[7]+
-      current_rasters[[8]]*weights[8]+
-      current_rasters[[9]]*weights[9]+current_rasters[[10]]*weights[10]
-      #Reduce(`+`, Map(`*`, append(current_rasters,z_lista), weights))|>
-    combined_raster=combined_raster |> 
-      aggregate( fact = 3, fun = "mean")##Para que se tarde un poco menos en pintarlo con leaflet
-    print("suma lista")
+      # current_rasters[[1]]*weights[1]+
+      # current_rasters[[2]]*weights[2]+
+      # current_rasters[[3]]*weights[3]+
+      # current_rasters[[4]]*weights[4]+
+      # current_rasters[[5]]*weights[5]+
+      # current_rasters[[6]]*weights[6]+
+      # current_rasters[[7]]*weights[7]+
+      # current_rasters[[8]]*weights[8]+
+      # current_rasters[[9]]*weights[9]+current_rasters[[10]]*weights[10]
+      Reduce(`+`, Map(`*`, current_rasters , weights))
+    combined_raster=combined_raster #|> 
+      #aggregate( fact = 3, fun = "mean")##Para que se tarde un poco menos en pintarlo con leaflet
+    #print("suma lista")
     return(combined_raster )
   })
   
@@ -255,13 +256,13 @@ server <- function(input, output, session) {
     # z[z |> is.na()]=0
     # print("termina el extract")
     # Aquí se dibuja el raster
-    print("Haciendo el dibujo")
+    #print("Haciendo el dibujo")
     leafletProxy("result_map") |> 
       clearImages() |> 
       clearControls()  |> 
       addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8, group = "Pertinencia") |> 
       addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Pertinencia', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = c('Baja', "Alta"),tickLength = 0) 
-    print("dibujo listo")
+    #print("dibujo listo")
   })
 }
 
