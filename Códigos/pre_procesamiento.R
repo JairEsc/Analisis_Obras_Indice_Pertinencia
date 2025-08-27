@@ -19,12 +19,12 @@ secciones=secciones |>
 
 ##El filtro va a ser el top necesario para ganar el +30% de la población votante por municipio.
 
-secciones_top_morena=secciones |> 
-  dplyr::group_by(NOM_MUN,GANADOR) |> ##Agrupamos por GANADOR para incentivar a una seccion donde ganó(muchos votos) y una donde perdió por poco (porque aún tuvo muchos votos)
-  dplyr::arrange(dplyr::desc(porc_morena_d_mun)) |> 
-  dplyr::slice_head(n=1)##Tomamos una de cada una 
+# secciones_top_morena=secciones |> 
+#   dplyr::group_by(NOM_MUN,GANADOR) |> ##Agrupamos por GANADOR para incentivar a una seccion donde ganó(muchos votos) y una donde perdió por poco (porque aún tuvo muchos votos)
+#   dplyr::arrange(dplyr::desc(porc_morena_d_mun)) |> 
+#   dplyr::slice_head(n=1)##Tomamos una de cada una 
 
-secciones_top_morena$geometry |> plot()#Vemos la cobertura estatal
+#secciones_top_morena$geometry |> plot()#Vemos la cobertura estatal
 
 
 secciones_top_morena_vect=terra::vect(secciones |> st_as_sf() |> st_transform(st_crs(municipios)))

@@ -4,4 +4,6 @@ Inputs/Nivel de uso
 .RData
 .Rhistory
 .Rproj.user/
-Inputs/Rasters_Generados_en_R/Otros/*
+Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/raster_*
+Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/vect_*
+Inputs/Rasters_Generados_en_R/Otros/en puntos.rar
