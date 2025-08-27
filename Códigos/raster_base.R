@@ -20,3 +20,4 @@ terra::crs(base)=st_crs(municipios)$wkt
 values(base)=1
 base=terra::mask(base,municipios)
 #plot(base)
+base |> writeRas

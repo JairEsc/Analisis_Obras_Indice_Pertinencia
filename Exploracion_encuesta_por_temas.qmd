@@ -29,13 +29,51 @@ Utilizamos los datos de 2025 con las siguientes preguntas
 
 Por lo anterior, se consideran las posibles respuestas para su clasificación junto a otras preguntas de la misma temática.
 
-### Educación 
+### Infraestructura Educativa
 
 -   X.Ha.mejorado..se.ha.quedado.igual.o.ha.empeorado..Instalaciones.de.planteles.educativos.
 
 -   X.Ha.mejorado..se.ha.quedado.igual.o.ha.empeorado..Equipamiento.en.aulas.
 
-Ambas preguntas se responden "Sí" o "No", por lo que para cada una, se filtra la encuesta según su respuesta y se calcula un kernel de densidad gaussiana
+### Salud
+
+-   SALUD...En.el.último.año...usted.se.vio.afectado.a.por.Mal.equipamiento.en.las.instalaciones."
+
+### Espacios Públicos
+
+-   En.el.último.año...usted.se.vio.afectado.a.por.Falta.de.parques..jardines.o.lugares.de.esparcimiento.cerca.de.su.vivienda."
+
+### Agua y servicios públicos
+
+-   En.el.último.año...usted.se.vio.afectado.a.por.Falta.de.suministro.de.agua.en.la.vivienda."
+
+-   Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo. (Escasez de agua)
+
+-   Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo. (Drenaje)
+
+-   Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo. (Servicios Públicos)
+
+-   Y...cuál.considera.que.es.el.principal.problema.en.su.colonia.(Agua potable)
+
+-   Y...cuál.considera.que.es.el.principal.problema.en.su.colonia.(Drenaje)
+
+-   Y...cuál.considera.que.es.el.principal.problema.en.su.colonia.(Servicios públicos)
+
+### Infraestructura Vial
+
+-   En.el.último.año...usted.se.vio.afectado.a.por.Invertir.mucho.tiempo.en.traslados.por.falta.de.carreteras."
+
+-   En.el.último.año...usted.se.vio.afectado.a.por.Caminos.sin.posibilidad.de.lograr.velocidad.por.estar.en.mal.estado."
+
+-   En.el.último.año...usted.se.vio.afectado.a.por.Deterioro.de.calles.y.avenidas.por.falta.de.mantenimiento."
+
+-   Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo. (Infraestructura vial)
+
+-   Y...cuál.considera.que.es.el.principal.problema.en.su.colonia. (Infraestructura vial)
+
+## Procesamiento y medida resumen
+
+Para su uso, se genera un raster resumen que define la percepción de la infraestructura actual de cada tema. Por ejemplo, para **Infraestructura Educativa** ambas preguntas se responden con "Sí" o "No", por lo que para cada una, se filtra la encuesta según su respuesta y se calcula un kernel de densidad gaussiana con decaimiento a 1km, los cuales se combinan en un solo raster de percepción de infraestructura a partir de la diferencia de las medias (de las respuestas de percepción positiva - las respuestas de percepción negativa), siendo valores positivos una percepción positiva a la infraestructura actual y valores negativos a una percepción negativa. Los valores muy cercanos a cero se interpretan como incertidumbre o falta de datos, por lo que se omiten.
 
 ```{r}
 #| echo: false
@@ -44,29 +82,48 @@ Ambas preguntas se responden "Sí" o "No", por lo que para cada una, se filtra l
 library(raster)
 library(terra)
 library(sf)
+library(leaflet)
+library(leaflegend)
 
-source("Códigos/encuesta_leer_y_funcion_kernel_densidad.R")
-par(mfrow=c(2,2))
-lista_rasters_educacion=list()
-lista_rasters_educacion[["Planteles_mejor"]]=filtrar_dada_pregunta_y_boolean(5,T)
-lista_rasters_educacion[["Planteles_mejor"]]|> plot(main='Mejora en planteles educativos')
-lista_rasters_educacion[["Equipamiento_aulas_mejor"]]=filtrar_dada_pregunta_y_boolean(6,T)
-lista_rasters_educacion[["Equipamiento_aulas_mejor"]]|> plot(main='Mejora en equipamiento de aulas')
-lista_rasters_educacion[["Planteles_peor"]]=filtrar_dada_pregunta_y_boolean(5,F)
-lista_rasters_educacion[["Planteles_peor"]]|> plot(main='Empeorado en planteles educativos')
-lista_rasters_educacion[["Equipamiento_aulas_peor"]]=filtrar_dada_pregunta_y_boolean(6,F)
-lista_rasters_educacion[["Equipamiento_aulas_peor"]]|> plot(main='Empeorado en equipamiento de aulas')
+z="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Infraestructura educativa/diff_mejor_menos_peor.tif" |> raster()
+z[abs(z)<1e-5]=NA
+z2="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Salud/diff_no_afectado_menos_afectado.tif" |> raster()
+z2[abs(z2)<1e-5]=NA
+z3="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Espacios publicos/diff_no_afectado_menos_afectado.tif" |> raster()
+z3[abs(z3)<1e-5]=NA
+z4="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/diff_buena_percepcion_menos_mala_percepcion.tif" |> raster()
+z4[abs(z4)<1e-5]=NA
+z5="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/infraestructura_diff_mejor_menos_peor.tif" |> raster()
+z5[abs(z5)<1e-5]=NA
+
+
+
+
+leaflet() |> addTiles()|> 
+  addRasterImage(z,group='Infraestructura Educativa') |>
+  addRasterImage(z2,group='Salud') |>
+  addRasterImage(z3,group='Espacios Públicos') |>
+  addRasterImage(z4,group='Agua y servicios públicos') |>
+  addRasterImage(z5,group='Infraestructura Vial') |>
+  
+  addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Escala percepción (negativa - > positiva)', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20,width = 300,labels = '',tickLength = 0) |> addLayersControl(overlayGroups = c('Infraestructura Educativa','Salud','Espacios Públicos','Agua y servicios públicos','Infraestructura Vial'
+     ),options = layersControlOptions(collapsed = F)) |> hideGroup(c('Salud','Espacios Públicos','Agua y servicios públicos','Infraestructura Vial'
+     )) 
+
+
 ```
 
-Además, agregamos la matriz de correlación entre los rasters del mismo tema
+Además, agregamos la matriz de correlación entre los rasters resumen
 
 ```{r}
 #| echo: false
 library(ggcorrplot)
 library(raster)
-rasters_by_cells <- lista_rasters_educacion |> lapply(values)
+z_lista=list(z,z2,z3,z4,z5)
+rasters_by_cells <- z_lista |> lapply(values)
 rasters_by_cells=rasters_by_cells |> as.data.frame()
-colnames(rasters_by_cells)=gsub("\n","",names(lista_rasters_educacion))
+colnames(rasters_by_cells)=c('Infraestructura Educativa','Salud','Espacios Públicos','Agua y servicios públicos','Infraestructura Vial'
+     )
 cormat <- round(cor(rasters_by_cells,use = "na"),2)
 #head(cormat)
 ggcorrplot(cormat,lab = T,type = "lower",show.diag = F)
