@@ -180,3 +180,92 @@ lista_rasters_agua[["peor5"]] |> writeRaster("Inputs/Rasters_Generados_en_R/Otro
 lista_rasters_agua[["peor6"]] |> writeRaster("Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/princ_prob_estado_escasez_agua.tif")
 lista_rasters_agua[["peor7"]] |> writeRaster("Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/princ_prob_estado_servicios_publicos.tif")
 lista_rasters_agua[["diff_mejor_menos_peor"]] |> writeRaster("Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/diff_buena_percepcion_menos_mala_percepcion.tif")
+
+
+
+
+##Infraestructura
+
+lista_rasters_Infraestructura=list()
+
+names(respuestas_encuesta_2025)
+
+lista_rasters_Infraestructura[["infraestructura_hidalgo_mejor"]]=filtrar_dada_pregunta_y_boolean(53,F)  # [53] "¿Cuál considera que es el principal problema que enfrenta el estado de Hidalgo?_INFRAESTRUCTURA VIAL / MANTENIMIENTO EN CALLES"
+lista_rasters_educacion[["infraestructura_hidalgo_mejor"]] |> plot()
+terra::writeRaster(lista_rasters_educacion[["infraestructura_hidalgo_mejor"]], filename = "Raster/Guardados/infraestructura_hidalgo_mejor.tif", overwrite = TRUE)
+
+lista_rasters_Infraestructura[["infraestructura_hidalgo_peor"]]=filtrar_dada_pregunta_y_boolean(53,T)  # [53] "¿Cuál considera que es el principal problema que enfrenta el estado de Hidalgo?_INFRAESTRUCTURA VIAL / MANTENIMIENTO EN CALLES"
+lista_rasters_educacion[["infraestructura_hidalgo_peor"]] |> plot()
+terra::writeRaster(lista_rasters_educacion[["infraestructura_hidalgo_peor"]], filename = "Raster/Guardados/infraestructura_hidalgo_peor.tif", overwrite = TRUE)
+
+
+
+
+
+lista_rasters_educacion[["infraestructura_colonia_mejor"]]=filtrar_dada_pregunta_y_boolean(25,F)  # [25] "Y, ¿cuál considera que es el principal problema en su colonia?_INFRAESTRUCTURA VIAL / MANTENIMIENTO EN CALLES" 
+lista_rasters_educacion[["infraestructura_colonia_mejor"]] |> plot()
+terra::writeRaster(lista_rasters_educacion[["infraestructura_colonia_mejor"]], filename = "Raster/Guardados/infraestructura_colonia_mejor.tif", overwrite = TRUE)
+
+lista_rasters_Infraestructura[["infraestructura_colonia_peor"]]=filtrar_dada_pregunta_y_boolean(25,T)  # [25] "Y, ¿cuál considera que es el principal problema en su colonia?_INFRAESTRUCTURA VIAL / MANTENIMIENTO EN CALLES" 
+lista_rasters_educacion[["infraestructura_colonia_peor"]] |> plot()
+terra::writeRaster(lista_rasters_educacion[["infraestructura_colonia_peor"]], filename = "Raster/Guardados/infraestructura_colonia_peor.tif", overwrite = TRUE)
+
+
+
+
+
+lista_rasters_Infraestructura[["infraestructura_tiempo_mejor"]]=filtrar_dada_pregunta_y_boolean(3,F) # [3] "En el último año, ¿usted se vio afectado/a por Invertir mucho tiempo en traslados por falta de carreteras?" 
+terra::writeRaster(lista_rasters_educacion[["infraestructura_tiempo_mejor"]], filename = "Raster/Guardados/infraestructura_tiempo_mejor.tif", overwrite = TRUE)
+
+lista_rasters_Infraestructura[["infraestructura_tiempo_peor"]]=filtrar_dada_pregunta_y_boolean(3,T) # [3] "En el último año, ¿usted se vio afectado/a por Invertir mucho tiempo en traslados por falta de carreteras?" 
+terra::writeRaster(lista_rasters_educacion[["infraestructura_tiempo_peor"]], filename = "Raster/Guardados/infraestructura_tiempo_peor.tif", overwrite = TRUE)
+
+
+
+
+lista_rasters_Infraestructura[["infraestructura_velocidad_mejor"]]=filtrar_dada_pregunta_y_boolean(4,F)  # [4] "En el último año, ¿usted se vio afectado/a por Caminos sin posibilidad de lograr velocidad por estar en mal estado?"  
+terra::writeRaster(lista_rasters_educacion[["infraestructura_velocidad_mejor"]], filename = "Raster/Guardados/infraestructura_velocidad_mejor.tif", overwrite = TRUE)
+
+lista_rasters_Infraestructura[["infraestructura_velocidad_peor"]]=filtrar_dada_pregunta_y_boolean(4,T)  # [4] "En el último año, ¿usted se vio afectado/a por Caminos sin posibilidad de lograr velocidad por estar en mal estado?"  
+terra::writeRaster(lista_rasters_educacion[["infraestructura_velocidad_peor"]], filename = "Raster/Guardados/infraestructura_velocidad_peor.tif", overwrite = TRUE)
+
+
+
+
+lista_rasters_Infraestructura[["infraestructura_deterioro_mejor"]]=filtrar_dada_pregunta_y_boolean(6,F)  #  [6] "En el último año, ¿usted se vio afectado/a por Deterioro de calles y avenidas por falta de mantenimiento?"
+terra::writeRaster(lista_rasters_educacion[["infraestructura_deterioro_mejor"]], filename = "Raster/Guardados/infraestructura_deterioro_mejor.tif", overwrite = TRUE)
+
+lista_rasters_Infraestructura[["infraestructura_deterioro_peor"]]=filtrar_dada_pregunta_y_boolean(6,T)  #  [6] "En el último año, ¿usted se vio afectado/a por Deterioro de calles y avenidas por falta de mantenimiento?"
+terra::writeRaster(lista_rasters_educacion[["infraestructura_deterioro_peor"]], filename = "Raster/Guardados/infraestructura_deterioro_peor.tif", overwrite = TRUE)
+
+
+
+(mean(
+  lista_rasters_educacion[["infraestructura_tiempo_mejor"]],
+  lista_rasters_educacion[["infraestructura_velocidad_mejor"]],
+  lista_rasters_educacion[["infraestructura_deterioro_mejor"]]
+) - mean(
+  lista_rasters_educacion[["infraestructura_tiempo_peor"]],
+  lista_rasters_educacion[["infraestructura_velocidad_peor"]],
+  lista_rasters_educacion[["infraestructura_deterioro_peor"]],
+  sum(
+  lista_rasters_educacion[["infraestructura_hidalgo_peor"]],
+  lista_rasters_educacion[["infraestructura_colonia_peor"]])
+)) |>  plot()
+
+(mean(
+  lista_rasters_Infraestructura[["infraestructura_tiempo_mejor"]],
+  lista_rasters_Infraestructura[["infraestructura_velocidad_mejor"]],
+  lista_rasters_Infraestructura[["infraestructura_deterioro_mejor"]]
+) - mean(
+  lista_rasters_Infraestructura[["infraestructura_tiempo_peor"]],
+  lista_rasters_Infraestructura[["infraestructura_velocidad_peor"]],
+  lista_rasters_Infraestructura[["infraestructura_deterioro_peor"]],
+  sum(
+    lista_rasters_Infraestructura[["infraestructura_hidalgo_peor"]],
+    lista_rasters_Infraestructura[["infraestructura_colonia_peor"]])
+))  ->  lista_rasters_Infraestructura[["diff_mejor_menos_peor"]]
+
+
+writeRaster(lista_rasters_Infraestructura[["diff_mejor_menos_peor"]], filename = "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/diff_infraestructura_mejor_menos_peor.tif", overwrite = TRUE)
+

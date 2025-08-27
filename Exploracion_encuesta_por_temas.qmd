@@ -93,7 +93,7 @@ z3="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Espacios 
 z3[abs(z3)<1e-5]=NA
 z4="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/diff_buena_percepcion_menos_mala_percepcion.tif" |> raster()
 z4[abs(z4)<1e-5]=NA
-z5="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/infraestructura_diff_mejor_menos_peor.tif" |> raster()
+z5="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/diff_infraestructura_mejor_menos_peor.tif" |> raster()
 z5[abs(z5)<1e-5]=NA
 
 
