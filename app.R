@@ -221,7 +221,7 @@ server <- function(input, output, session) {
         rasters_list_names[1:7],
         "Distancia a localidades con bajo acceso a agua entubada",
         rasters_list_names[9],
-        "Percepción infraestructura hídrica"
+        "Percepción suministro de agua"
       )
       nombres_agua
     }
