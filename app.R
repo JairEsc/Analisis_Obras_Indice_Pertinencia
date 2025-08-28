@@ -79,8 +79,9 @@ rasters_list_names[[10]]="Percepción infraestructura vial"
 # 1:10 |> sapply(\(x){
 #   rasters[[x]] |> writeRaster(paste0("Inputs/Rasters_Generados_en_R/rasters_app/",letters[x],"_",gsub(" ","_",gsub("\n","",rasters_list_names[x])),".tif"),overwrite=T)
 # })
-rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)#Duplicar con rasters de agua.
-rasters_agua=list.files("Inputs/Rasters_Generados_en_R/rasters_app_agua/",full.names = T) |> lapply(raster)#Duplicar con rasters de agua.
+rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)
+rasters_agua=list.files("Inputs/Rasters_Generados_en_R/rasters_app_agua/",full.names = T) |> lapply(raster)
+rasters_drenaje=list.files("Inputs/Rasters_Generados_en_R/rasters_app_drenaje/",full.names = T) |> lapply(raster)
 
 ###UI
 descripciones_minimas=c(
@@ -159,7 +160,7 @@ ui <- fluidPage(
           div(class = "lg:col-span-1 panel sliders-responsive",
               div(class='flex',
               h1(class = "text-2xl font-semibold mb-6 text-gray-800", "Análisis de obras:"),
-              selectInput(inputId = "select_obras",label="",choices = c("Infraestructura vial","Infraestructura Hídrica")) 
+              selectInput(inputId = "select_obras",label="",choices = c("Infraestructura vial","Infraestructura Suministro de Agua","Infraestructura Drenaje")) 
               ),
               h2(class = "text-2xl font-semibold mb-6 text-gray-800", "Ajustar Pesos de Rasters"),
               
@@ -217,23 +218,40 @@ server <- function(input, output, session) {
     titulos_para_sliders <- if (input$select_obras == 'Infraestructura vial') {
       rasters_list_names
     } else {
+      if(input$select_obras == "Infraestructura Suministro de Agua"){
       nombres_agua <- c(
         rasters_list_names[1:7],
         "Distancia a localidades con bajo acceso a agua entubada",
         rasters_list_names[9],
         "Percepción suministro de agua"
-      )
+      )}
+      else{nombres_agua <- c(
+        rasters_list_names[1:7],
+        "Distancia a localidades con bajo acceso a drenaje sanitario",
+        rasters_list_names[9],
+        "Percepción infraestructura de drenaje"
+      )}
       nombres_agua
     }
     descripciones_para_sliders <- if (input$select_obras == 'Infraestructura vial') {
       descripciones_minimas
     } else {
-      nombres_agua <- c(
-        descripciones_minimas[1:7],
-        "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra",
-        descripciones_minimas[9],
-        "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"
-      )
+      if(input$select_obras == "Infraestructura Suministro de Agua"){
+        nombres_agua <- c(
+          descripciones_minimas[1:7],
+          "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra",
+          descripciones_minimas[9],
+          "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"
+        )
+      }else{
+        nombres_agua <- c(
+          descripciones_minimas[1:7],
+          "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a drenaje sanitario. I.e. más pertinente la obra",
+          descripciones_minimas[9],
+          "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"
+        )
+      }
+      
       nombres_agua
     }
     
@@ -259,7 +277,11 @@ server <- function(input, output, session) {
     if (input$select_obras == 'Infraestructura vial') {
       rasters_a_usar <- rasters
     } else {
-      rasters_a_usar <- c(rasters[1:7], rasters_agua[[1]], rasters[[9]], rasters_agua[[2]])
+      if(input$select_obras == "Infraestructura Suministro de Agua"){
+      rasters_a_usar <- c(rasters[1:7], rasters_agua[[1]], rasters[[9]], rasters_agua[[2]])}
+      else{
+        rasters_a_usar <- c(rasters[1:7], rasters_drenaje[[1]], rasters[[9]], rasters_drenaje[[2]])
+      }
     }
     return(rasters_a_usar)
   })
@@ -268,7 +290,12 @@ server <- function(input, output, session) {
     if (input$select_obras == 'Infraestructura vial') {
       shapes_a_usar <- list(lineas_c_extract, puntos_c_extract)
     } else {
+      if(input$select_obras == "Infraestructura Suministro de Agua"){
       shapes_a_usar <- list(lineas_agua, puntos_agua)
+      }
+      else{
+        shapes_a_usar <- list(lineas_drenaje, puntos_drenaje)
+      }
     }
     return(shapes_a_usar)
   })
@@ -337,7 +364,7 @@ server <- function(input, output, session) {
     leafletProxy("result_map") |>
       clearImages() |>
       clearControls() |>
-      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8, group = "----Pertinencia----") |>
+      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8, group = "Pertinencia") |>
       addLegendNumeric( pal = colorNumeric('Spectral', seq(min_raster,max_raster,0.01)) , values = seq(min_raster,max_raster,0.01), position = 'bottomright', title = 'Pertinencia', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = c(round(min_raster,2) |> paste0(), round(max_raster,2) |> paste0()),tickLength = 0)
   })
   

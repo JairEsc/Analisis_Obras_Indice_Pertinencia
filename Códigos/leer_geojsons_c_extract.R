@@ -3,8 +3,12 @@ library(sf)
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_agua_linea.geojson") |> st_transform(st_crs("EPSG:4326"))->lineas_agua
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_agua_punto.geojson")|> st_transform(st_crs("EPSG:4326"))->puntos_agua
 
+##Generar los puntos y lineas de obras de drenaje
+st_read("Inputs/Rasters_Generados_en_R/Otros/obras_drenaje_linea.geojson") |> st_transform(st_crs("EPSG:4326"))->lineas_drenaje
+st_read("Inputs/Rasters_Generados_en_R/Otros/obras_drenaje_punto.geojson")|> st_transform(st_crs("EPSG:4326"))->puntos_drenaje
 
-####Leer obras de agua en puntos y lineas
+
+####Leer obras viales en puntos y lineas
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_linea_extract.geojson") |> st_transform(st_crs("EPSG:4326"))->lineas_c_extract
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_punto_extract.geojson")|> st_transform(st_crs("EPSG:4326"))->puntos_c_extract
 
