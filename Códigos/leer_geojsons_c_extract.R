@@ -1,5 +1,8 @@
 library(sf)
+##Generar los puntos y lineas de obras de agua
 
+
+####Leer obras de agua en puntos y lineas
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_linea_extract.geojson") |> st_transform(st_crs("EPSG:4326"))->lineas_c_extract
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_punto_extract.geojson")|> st_transform(st_crs("EPSG:4326"))->puntos_c_extract
 

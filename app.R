@@ -44,7 +44,7 @@ rasters_list_names=rasters_list_names[c(1:8,10)]
 # #z_lista |> lapply(plot)
 # z_lista[[1]][z_lista[[1]] |> is.na()]=0
 # z_lista[[1]]=z_lista[[1]] |> terra::mask(municipios)
-weights= c(-0.15,-0.13,0,0,-0.13,-0.17,-0.15,0,-0.19,-0.17)
+weights= c(0.15,0.13,0,0,0.13,0.17,0.15,0,0.19,0.17)
   #c(9,6,0,0,6,8,7,0,0,11)#c(2*c(9,3,0,0,5,8,7,0,1),0,0,0,0,0)
 #weights=weights/sum(weights)
 ##Darles interpretación como en la documentación.
@@ -79,7 +79,9 @@ rasters_list_names[[10]]="Percepción infraestructura vial"
 # 1:10 |> sapply(\(x){
 #   rasters[[x]] |> writeRaster(paste0("Inputs/Rasters_Generados_en_R/rasters_app/",letters[x],"_",gsub(" ","_",gsub("\n","",rasters_list_names[x])),".tif"),overwrite=T)
 # })
-rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)
+rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)#Duplicar con rasters de agua.
+rasters_agua=list.files("Inputs/Rasters_Generados_en_R/rasters_app_agua/",full.names = T) |> lapply(raster)#Duplicar con rasters de agua.
+
 ###UI
 descripciones_minimas=c(
   "Se mide en distancia. Mayor valor significa más pertinente la obra",
@@ -155,26 +157,17 @@ ui <- fluidPage(
       div(class = "grid grid-cols-1 lg:grid-cols-3 gap-8",
           # Panel lateral para los controles (pesos de los rasters)
           div(class = "lg:col-span-1 panel sliders-responsive",
+              div(class='flex',
+              h1(class = "text-2xl font-semibold mb-6 text-gray-800", "Análisis de obras:"),
+              selectInput(inputId = "select_obras",label="",choices = c("Infraestructura vial","Infraestructura Hídrica")) 
+              ),
               h2(class = "text-2xl font-semibold mb-6 text-gray-800", "Ajustar Pesos de Rasters"),
               
               p(class = "text-sm text-gray-600 mb-6", 
                 "Define la influencia de cada uno de los 9 rasters estandarizados. Los valores pueden estar entre -1 y 1."),
               
               # Sliders para los 9 rasters
-              lapply(1:10, function(i) {
-                div(class = "mb-4",
-                    p(class = "input-label", rasters_list_names[[i]]),
-                    sliderInput(
-                      inputId = paste0("raster_weight_", i),
-                      label = descripciones_minimas[i], # El label se maneja con el 'p' de arriba
-                      min = -1,
-                      max = 1,
-                      value = weights[i],
-                      step = 0.01,
-                      width = "100%"
-                    )
-                )
-              }),
+              uiOutput("dynamic_sliders"),
               # h2(class = "text-2xl font-semibold mb-6 text-gray-800", "Capa de percepción"),
               # div(class = "mb-4",
               #     p(class = "input-label", "otro1"),
@@ -216,10 +209,70 @@ ui <- fluidPage(
       )
   )
 )
+##rasters es una variable global
+rasters_segun_eleccion=rasters
 server <- function(input, output, session) {
+  output$dynamic_sliders <- renderUI({
+    
+    # 1. Elegir la lista de descripciones según la selección del usuario
+    titulos_para_sliders <- if (input$select_obras == 'Infraestructura vial') {
+      # Usa los nombres originales para el caso 'Infraestructura vial'
+      rasters_list_names
+    } else {
+      # Crea una nueva lista de nombres para el caso 'Agua'
+      nombres_agua <- c(
+        rasters_list_names[1:7],
+        "Distancia a localidades con bajo acceso a agua entubada",
+        rasters_list_names[9],
+        "Percepción infraestructura hídrica"
+      )
+      nombres_agua
+    }
+    descripciones_para_sliders <- if (input$select_obras == 'Infraestructura vial') {
+      # Usa los nombres originales para el caso 'Infraestructura vial'
+      descripciones_minimas
+    } else {
+      # Crea una nueva lista de nombres para el caso 'Agua'
+      nombres_agua <- c(
+        descripciones_minimas[1:7],
+        "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra",
+        descripciones_minimas[9],
+        "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"
+      )
+      nombres_agua
+    }
+    
+    # 2. Usar lapply para crear los sliders con las descripciones elegidas
+    lapply(1:10, function(i) {
+      div(class = "mb-4",
+          p(class = "input-label", titulos_para_sliders[[i]]),
+          sliderInput(
+            inputId = paste0("raster_weight_", i),
+            label = descripciones_para_sliders[i],
+            min = 0,
+            max = 1,
+            value = weights[i],
+            step = 0.01,
+            width = "100%"
+          )
+      )
+    })
+  })
+  rasters_seleccionados <- reactive({
+    print(paste0("Estamos usando: ", input$select_obras))
+    
+    if (input$select_obras == 'Infraestructura vial') {
+      rasters_a_usar <- rasters
+    } else {
+      # Use `c()` to combine lists/vectors
+      rasters_a_usar <- c(rasters[1:7], rasters_agua[[1]], rasters[[9]], rasters_agua[[2]])
+    }
+    #print(rasters_a_usar)
+    return(rasters_a_usar)
+  })
   dummy_raster_data <- eventReactive(input$generate_map_button, {
-    current_rasters <- rasters
-
+    current_rasters <- rasters_seleccionados()
+    current_rasters[[1]]=-current_rasters[[1]]
     if (length(current_rasters) != 10) {
       stop("Este es un stop para asegurarme que uní servicios en un solo raster")
     }
@@ -229,7 +282,7 @@ server <- function(input, output, session) {
     }
     print(weights)
     print("Haciendo la suma")
-    combined_raster = Reduce(`+`, Map(`*`, current_rasters , weights))
+    combined_raster = Reduce(`+`, Map(`*`, current_rasters , -weights))
     combined_raster=combined_raster 
     return(combined_raster )
   })
@@ -318,23 +371,6 @@ server <- function(input, output, session) {
                                                                                                     "<b>Inversión:</b> ", inversion, "<br>",
                                                                                                     "<b>Pertinencia:</b> ", pertinencia)))
   })
-  # observeEvent(input$download_excel,{
-  #   req(dummy_raster_data())
-  #   print("Inicia el extract")
-  #   dummy_raster_data() |> raster::extract(lineas_c_extract|> st_transform(st_crs("EPSG:32614")), method='simple', buffer=NULL, small=FALSE, cellnumbers=FALSE,
-  #                                  fun=mean, na.rm=TRUE)->z
-  #   z[z |> is.na()]=0
-  #   lineas_c_extract$extract[1:10]=z
-  #   dummy_raster_data() |> raster::extract(puntos_c_extract|> st_transform(st_crs("EPSG:32614")), method='simple', buffer=NULL, small=FALSE, cellnumbers=FALSE,
-  #                                  fun=mean, na.rm=TRUE)->z
-  #   puntos_c_extract$extract[1:10]=z
-  #   z[z |> is.na()]=0
-  #   print("termina el extract")
-  #   rbind(lineas_c_extract |> dplyr::select(Municipio:Ejecutora,Geometria_tipo,extract) |> dplyr::rename(indice_pertinencia=extract) |> 
-  #     st_drop_geometry(),
-  #     puntos_c_extract |> dplyr::select(Municipio:Ejecutora,Geometria_tipo,extract) |> dplyr::rename(indice_pertinencia=extract) |> 
-  #       st_drop_geometry()) |> dplyr::arrange(dplyr::desc(extract))->zz
-  # })
   observeEvent(input$generate_map_button, {
     req(dummy_raster_data())
     min_raster=raster::minValue(dummy_raster_data())
