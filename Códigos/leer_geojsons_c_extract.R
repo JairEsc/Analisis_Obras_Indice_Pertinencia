@@ -26,7 +26,7 @@ lineas_labels <- lapply(1:nrow(lineas_c_extract), function(i) {
   
   htmltools::HTML(paste0("<b>Obra:</b> ", obra_2,
                          "<b>Inversión:</b> ", inversion, "<br>",
-                         "<b>Pertinencia:</b> ", pertinencia))
+                         "<b>Pertinencia:</b> ", "click para mostrar"))
 
 })
 
@@ -55,5 +55,5 @@ puntos_labels <- lapply(1:nrow(puntos_c_extract), function(i) {
   
   htmltools::HTML(paste0("<b>Obra:</b> ", obra_2,
                          "<b>Inversión:</b> ", inversion, "<br>",
-                         "<b>Pertinencia:</b> ", pertinencia))
+                         "<b>Pertinencia:</b> ", "click para mostrar"))
 })
