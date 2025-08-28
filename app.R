@@ -214,12 +214,9 @@ rasters_segun_eleccion=rasters
 server <- function(input, output, session) {
   output$dynamic_sliders <- renderUI({
     
-    # 1. Elegir la lista de descripciones según la selección del usuario
     titulos_para_sliders <- if (input$select_obras == 'Infraestructura vial') {
-      # Usa los nombres originales para el caso 'Infraestructura vial'
       rasters_list_names
     } else {
-      # Crea una nueva lista de nombres para el caso 'Agua'
       nombres_agua <- c(
         rasters_list_names[1:7],
         "Distancia a localidades con bajo acceso a agua entubada",
@@ -229,10 +226,8 @@ server <- function(input, output, session) {
       nombres_agua
     }
     descripciones_para_sliders <- if (input$select_obras == 'Infraestructura vial') {
-      # Usa los nombres originales para el caso 'Infraestructura vial'
       descripciones_minimas
     } else {
-      # Crea una nueva lista de nombres para el caso 'Agua'
       nombres_agua <- c(
         descripciones_minimas[1:7],
         "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra",
@@ -242,7 +237,6 @@ server <- function(input, output, session) {
       nombres_agua
     }
     
-    # 2. Usar lapply para crear los sliders con las descripciones elegidas
     lapply(1:10, function(i) {
       div(class = "mb-4",
           p(class = "input-label", titulos_para_sliders[[i]]),
@@ -258,21 +252,30 @@ server <- function(input, output, session) {
       )
     })
   })
+  
   rasters_seleccionados <- reactive({
     print(paste0("Estamos usando: ", input$select_obras))
     
     if (input$select_obras == 'Infraestructura vial') {
       rasters_a_usar <- rasters
     } else {
-      # Use `c()` to combine lists/vectors
       rasters_a_usar <- c(rasters[1:7], rasters_agua[[1]], rasters[[9]], rasters_agua[[2]])
     }
-    #print(rasters_a_usar)
     return(rasters_a_usar)
   })
+  
+  shapes_seleccionados <- reactive({
+    if (input$select_obras == 'Infraestructura vial') {
+      shapes_a_usar <- list(lineas_c_extract, puntos_c_extract)
+    } else {
+      shapes_a_usar <- list(lineas_agua, puntos_agua)
+    }
+    return(shapes_a_usar)
+  })
+  
   dummy_raster_data <- eventReactive(input$generate_map_button, {
     current_rasters <- rasters_seleccionados()
-    current_rasters[[1]]=-current_rasters[[1]]
+    current_rasters[[1]] <- -current_rasters[[1]]
     if (length(current_rasters) != 10) {
       stop("Este es un stop para asegurarme que uní servicios en un solo raster")
     }
@@ -282,145 +285,100 @@ server <- function(input, output, session) {
     }
     print(weights)
     print("Haciendo la suma")
-    combined_raster = Reduce(`+`, Map(`*`, current_rasters , -weights))
-    combined_raster=combined_raster 
-    return(combined_raster )
+    combined_raster <- Reduce(`+`, Map(`*`, current_rasters , -weights))
+    combined_raster <- combined_raster
+    return(combined_raster)
   })
   
   output$result_map <- renderLeaflet({
-    # Mapa inicial con obras y tiles
-    leaflet() |> 
-      addTiles()  |> 
-      addPolylines(data = lineas_c_extract, label = lineas_labels, group = 'Obras (líneas)',layerId = 1:nrow(lineas_c_extract)) |> 
-      addMarkers(data = puntos_c_extract, label = puntos_labels, group = 'Obras (puntos)',layerId = (1+nrow(lineas_c_extract)):(1+nrow(lineas_c_extract)+nrow(puntos_c_extract))) |> 
-      addLayersControl(overlayGroups = c("Pertinencia", 'Obras (líneas)', 'Obras (puntos)')) 
+    req(shapes_seleccionados())
+    lineas_seleccionadas <- shapes_seleccionados()[[1]]
+    puntos_seleccionadas <- shapes_seleccionados()[[2]]
+    labels_para_usar <- generate_labels(lineas_seleccionadas, puntos_seleccionadas)
+    leaflet() |>
+      addTiles() |>
+      addPolylines(data = lineas_seleccionadas, label = labels_para_usar[[1]], group = 'Obras (líneas)',layerId = 1:nrow(lineas_seleccionadas)) |>
+      addMarkers(data = puntos_seleccionadas, label = labels_para_usar[[2]], group = 'Obras (puntos)',layerId = (1+nrow(lineas_seleccionadas)):(nrow(lineas_seleccionadas)+nrow(puntos_seleccionadas))) |>
+      addLayersControl(overlayGroups = c("Pertinencia", 'Obras (líneas)', 'Obras (puntos)'))
   })
+  
   observeEvent(input$result_map_marker_click,{
     req(dummy_raster_data())
-    # print(input$result_map_marker_click$lat)
-    # print(input$result_map_marker_click$lng)
-    # obra_sel=(st_as_sf(data.table(obra=c("Seleccionada"),long=c(input$result_map_marker_click$lng),
-    #                           lat=c(input$result_map_marker_click$lat) ),coords=c("long","lat"),crs=4326))
-    obra_sel=puntos_c_extract[(as.numeric(input$result_map_marker_click$id)-nrow(lineas_c_extract)),]
-    dummy_raster_data() |> raster::extract(obra_sel|> st_transform(st_crs("EPSG:32614")), method='simple', buffer=NULL, small=FALSE, cellnumbers=FALSE,
-                                           fun=mean, na.rm=TRUE) ->z
-    ###Actualizar el pop up con un label
-    obra <- obra_sel$Obra[1]
+    req(shapes_seleccionados())
+    puntos_seleccionadas <- shapes_seleccionados()[[2]]
+    obra_sel <- puntos_seleccionadas[as.numeric(input$result_map_marker_click$id) - nrow(shapes_seleccionados()[[1]]), ]
     
-    # Dividir el texto en un vector de palabras
-    obra_words <- unlist(strsplit(obra, split = " "))
-    n <- length(obra_words)
+    z <- raster::extract(dummy_raster_data(), obra_sel |> st_transform(st_crs("EPSG:32614")), method='simple', buffer=NULL, small=FALSE, cellnumbers=FALSE,
+                         fun=mean, na.rm=TRUE)
     
-    # Reconstruir la cadena insertando <br> cada 5 palabras
-    obra_2 <- ""
-    for (j in seq(1, n, by = 5)) {
-      # Tomar un bloque de 5 palabras
-      end_index <- min(j + 4, n)
-      palabras_bloque <- obra_words[j:end_index]
-      
-      # Unir las palabras y agregar un salto de línea
-      linea <- paste(palabras_bloque, collapse = " ")
-      obra_2 <- paste0(obra_2, linea, "<br>")
-    }
-    
-    inversion <- ifelse(!is.na(obra_sel$Inversión[1]), paste0("$", formatC(obra_sel$Inversión[1], big.mark = ",", format = "d")), "-")
-    pertinencia <- round(z, 2)
-
     leafletProxy(mapId = "result_map") %>%
       clearPopups() %>%
-      addPopups(dat = input$result_map_marker_click, lat = ~lat, lng = ~lng, htmltools::HTML(paste0("<b>Obra:</b> ", obra_2,
-                                                                                                    "<b>Inversión:</b> ", inversion, "<br>",
-                                                                                                    "<b>Pertinencia:</b> ", pertinencia)))
+      addPopups(dat = input$result_map_marker_click, lat = ~lat, lng = ~lng, update_labels(obra_sel,z))
   })
   
   observeEvent(input$result_map_shape_click,{
     req(dummy_raster_data())
-    print(input$result_map_shape_click)
-    # print(input$result_map_marker_click$lng)
-    # obra_sel=(st_as_sf(data.table(obra=c("Seleccionada"),long=c(input$result_map_marker_click$lng),
-    #                           lat=c(input$result_map_marker_click$lat) ),coords=c("long","lat"),crs=4326))
-    obra_sel=input$result_map_shape_click$id |> as.numeric()
-    obra_sel=lineas_c_extract[obra_sel,]
-    dummy_raster_data() |> raster::extract(obra_sel|> st_transform(st_crs("EPSG:32614")), method='simple', buffer=NULL, small=FALSE, cellnumbers=FALSE,
-                                           fun=mean, na.rm=TRUE) ->z
-    ###Actualizar el pop up con un label
-    obra <- obra_sel$Obra[1]
-    
-    # Dividir el texto en un vector de palabras
-    obra_words <- unlist(strsplit(obra, split = " "))
-    n <- length(obra_words)
-    
-    # Reconstruir la cadena insertando <br> cada 5 palabras
-    obra_2 <- ""
-    for (j in seq(1, n, by = 5)) {
-      # Tomar un bloque de 5 palabras
-      end_index <- min(j + 4, n)
-      palabras_bloque <- obra_words[j:end_index]
-      
-      # Unir las palabras y agregar un salto de línea
-      linea <- paste(palabras_bloque, collapse = " ")
-      obra_2 <- paste0(obra_2, linea, "<br>")
-    }
-    
-    inversion <- ifelse(!is.na(obra_sel$Inversión[1]), paste0("$", formatC(obra_sel$Inversión[1], big.mark = ",", format = "d")), "-")
-    pertinencia <- round(z, 2)
+    req(shapes_seleccionados())
+    lineas_seleccionadas <- shapes_seleccionados()[[1]]
+    obra_sel <- as.numeric(input$result_map_shape_click$id)
+    obra_sel <- lineas_seleccionadas[obra_sel,]
+    z <- raster::extract(dummy_raster_data(), obra_sel |> st_transform(st_crs("EPSG:32614")), method='simple', buffer=NULL, small=FALSE, cellnumbers=FALSE,
+                         fun=mean, na.rm=TRUE)
     
     leafletProxy(mapId = "result_map") %>%
       clearPopups() %>%
-      addPopups(dat = input$result_map_shape_click, lat = ~lat, lng = ~lng, htmltools::HTML(paste0("<b>Obra:</b> ", obra_2,
-                                                                                                    "<b>Inversión:</b> ", inversion, "<br>",
-                                                                                                    "<b>Pertinencia:</b> ", pertinencia)))
+      addPopups(dat = input$result_map_shape_click, lat = ~lat, lng = ~lng, update_labels(obra_sel,z))
   })
+  
   observeEvent(input$generate_map_button, {
     req(dummy_raster_data())
-    min_raster=raster::minValue(dummy_raster_data())
-    max_raster=raster::maxValue(dummy_raster_data())
-    # Aquí se dibuja el raster
-    #print("Haciendo el dibujo")
-    leafletProxy("result_map") |> 
-      clearImages() |> 
-      clearControls()  |> 
-      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8, group = "----Pertinencia----") |> 
-      addLegendNumeric( pal = colorNumeric('Spectral', seq(min_raster,max_raster,0.01)) , values = seq(min_raster,max_raster,0.01), position = 'bottomright', title = 'Pertinencia', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = c(round(min_raster,2) |> paste0(), round(max_raster,2) |> paste0()),tickLength = 0) 
-    #print("dibujo listo")
+    min_raster <- raster::minValue(dummy_raster_data())
+    max_raster <- raster::maxValue(dummy_raster_data())
+    leafletProxy("result_map") |>
+      clearImages() |>
+      clearControls() |>
+      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8, group = "----Pertinencia----") |>
+      addLegendNumeric( pal = colorNumeric('Spectral', seq(min_raster,max_raster,0.01)) , values = seq(min_raster,max_raster,0.01), position = 'bottomright', title = 'Pertinencia', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = c(round(min_raster,2) |> paste0(), round(max_raster,2) |> paste0()),tickLength = 0)
   })
+  
   output$download_excel <- downloadHandler(
     filename = function() {
       paste0("listado_obras", Sys.Date(), ".xlsx")
     },
     content = function(file) {
-      req(dummy_raster_data()) # Ensure the raster data is available
+      req(dummy_raster_data())
+      req(shapes_seleccionados())
+      
+      lineas_a_usar <- shapes_seleccionados()[[1]]
+      puntos_a_usar <- shapes_seleccionados()[[2]]
       
       print("Inicia el extract")
-      # Extract data for lines
-      z_lineas <- raster::extract(dummy_raster_data(), lineas_c_extract |> st_transform(st_crs("EPSG:32614")), 
+      
+      z_lineas <- raster::extract(dummy_raster_data(), lineas_a_usar |> st_transform(st_crs("EPSG:32614")),
                                   method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
                                   fun = mean, na.rm = TRUE)
       z_lineas[is.na(z_lineas)] <- 0
-      lineas_c_extract$extract <- z_lineas
+      lineas_a_usar$extract <- z_lineas
       
-      # Extract data for points
-      z_puntos <- raster::extract(dummy_raster_data(), puntos_c_extract |> st_transform(st_crs("EPSG:32614")), 
+      z_puntos <- raster::extract(dummy_raster_data(), puntos_a_usar |> st_transform(st_crs("EPSG:32614")),
                                   method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
                                   fun = mean, na.rm = TRUE)
       z_puntos[is.na(z_puntos)] <- 0
-      puntos_c_extract$extract <- z_puntos
+      puntos_a_usar$extract <- z_puntos
       
       print("termina el extract")
       
-      # Combine data frames and arrange
       zz <- rbind(
-        lineas_c_extract |> 
-          dplyr::select(Municipio:Ejecutora, Geometria_tipo, extract) |> 
+        lineas_a_usar |>
+          dplyr::select(Municipio:Ejecutora, Geometria_tipo, extract) |>
           dplyr::rename(indice_pertinencia = extract) |>
           st_drop_geometry(),
-        puntos_c_extract |>
+        puntos_a_usar |>
           dplyr::select(Municipio:Ejecutora, Geometria_tipo, extract) |>
           dplyr::rename(indice_pertinencia = extract) |>
           st_drop_geometry()
-      ) |> dplyr::arrange(dplyr::desc(indice_pertinencia)) # Changed extract to indice_pertinencia
+      ) |> dplyr::arrange(dplyr::desc(indice_pertinencia))
       
-      # Write to Excel file
       openxlsx::write.xlsx(zz, file, overwrite = TRUE)
     }
   )
