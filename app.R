@@ -161,11 +161,11 @@ ui <- fluidPage(
               div(class='flex',
               h1(class = "text-2xl font-semibold mb-6 text-gray-800", "Análisis de obras:"),
               selectInput(inputId = "select_obras",label="",choices = c("Infraestructura vial","Infraestructura Suministro de Agua","Infraestructura Drenaje")) 
-              ),
+              ),uiOutput("second_input_infra_vial"),
               h2(class = "text-2xl font-semibold mb-6 text-gray-800", "Ajustar Pesos de Rasters"),
               
               p(class = "text-sm text-gray-600 mb-6", 
-                "Define la influencia de cada uno de los 9 rasters estandarizados. Los valores pueden estar entre -1 y 1."),
+                "Define la influencia de cada uno de los rasters (estandarizados)"),
               
               # Sliders para los 9 rasters
               uiOutput("dynamic_sliders"),
@@ -213,6 +213,12 @@ ui <- fluidPage(
 ##rasters es una variable global
 rasters_segun_eleccion=rasters
 server <- function(input, output, session) {
+  output$second_input_infra_vial=renderUI({
+    if(input$select_obras == 'Infraestructura vial'){
+      selectInput(inputId = "select_nuevas_o_reconstrucciones",label="Elegir tipo de obra vial",choices = c("Nuevas","Reconstrucciones")) 
+    }
+    else{div()}
+  })
   output$dynamic_sliders <- renderUI({
     
     titulos_para_sliders <- if (input$select_obras == 'Infraestructura vial') {

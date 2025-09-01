@@ -12,8 +12,15 @@ st_read("Inputs/Rasters_Generados_en_R/Otros/obras_drenaje_punto.geojson")|> st_
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_linea_extract.geojson") |> st_transform(st_crs("EPSG:4326"))->lineas_c_extract
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_punto_extract.geojson")|> st_transform(st_crs("EPSG:4326"))->puntos_c_extract
 
+(lineas_c_extract |> dplyr::filter(grepl(pattern = "Reconstrucci||Mejoram||Rehabili",Obra )))$Obra
+lineas_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación")}) 
+c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación")
 lineas_c_extract$extract[lineas_c_extract$extract |> is.na()]=0
 
+lineas_vialidades_mejora=lineas_c_extract[lineas_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación")}) 
+,]
+puntos_vialidades_mejora=puntos_c_extract[puntos_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación")}) 
+,]
 generate_labels=function(lineas_seleccionadas,puntos_seleccionadas){
   lineas_labels <- lapply(1:nrow(lineas_seleccionadas), function(i) {
     obra <- lineas_seleccionadas$Obra[i]

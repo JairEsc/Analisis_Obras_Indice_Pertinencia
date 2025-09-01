@@ -240,19 +240,21 @@ terra::writeRaster(lista_rasters_educacion[["infraestructura_deterioro_peor"]], 
 
 
 
-(mean(
-  lista_rasters_educacion[["infraestructura_tiempo_mejor"]],
-  lista_rasters_educacion[["infraestructura_velocidad_mejor"]],
-  lista_rasters_educacion[["infraestructura_deterioro_mejor"]]
-) - mean(
-  lista_rasters_educacion[["infraestructura_tiempo_peor"]],
-  lista_rasters_educacion[["infraestructura_velocidad_peor"]],
-  lista_rasters_educacion[["infraestructura_deterioro_peor"]],
-  sum(
-  lista_rasters_educacion[["infraestructura_hidalgo_peor"]],
-  lista_rasters_educacion[["infraestructura_colonia_peor"]])
-)) |>  plot()
-
+sum(
+  lista_rasters_Infraestructura[["infraestructura_tiempo_peor"]],
+  lista_rasters_Infraestructura[["infraestructura_velocidad_peor"]]
+  #,lista_rasters_educacion[["infraestructura_deterioro_peor"]],
+  ,
+  lista_rasters_Infraestructura[["infraestructura_hidalgo_peor"]]
+  #lista_rasters_educacion[["infraestructura_colonia_peor"]])
+)->lista_rasters_Infraestructura[["diff_mejor_menos_peor"]]
+sum(
+  lista_rasters_Infraestructura[["infraestructura_deterioro_peor"]],
+  #,lista_rasters_educacion[["infraestructura_deterioro_peor"]],
+  
+  lista_rasters_Infraestructura[["infraestructura_colonia_peor"]]
+)->lista_rasters_Infraestructura[["diff_mejor_menos_peor"]]
+lista_rasters_Infraestructura[["diff_mejor_menos_peor"]] |> plot()
 (mean(
   lista_rasters_Infraestructura[["infraestructura_tiempo_mejor"]],
   lista_rasters_Infraestructura[["infraestructura_velocidad_mejor"]],
@@ -267,5 +269,5 @@ terra::writeRaster(lista_rasters_educacion[["infraestructura_deterioro_peor"]], 
 ))  ->  lista_rasters_Infraestructura[["diff_mejor_menos_peor"]]
 
 
-writeRaster(lista_rasters_Infraestructura[["diff_mejor_menos_peor"]], filename = "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/diff_infraestructura_mejor_menos_peor.tif", overwrite = TRUE)
+writeRaster(lista_rasters_Infraestructura[["diff_mejor_menos_peor"]], filename = "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/infraestructura_percepcion_negativa_vialidades.tif", overwrite = TRUE)
 
