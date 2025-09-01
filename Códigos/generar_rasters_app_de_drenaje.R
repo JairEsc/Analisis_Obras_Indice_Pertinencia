@@ -140,7 +140,7 @@ sum(lista_rasters_drenaje[["peor3"]],lista_rasters_drenaje[["peor5"]],lista_rast
 
 sum(lista_rasters_drenaje[["peor3"]],lista_rasters_drenaje[["peor5"]],lista_rasters_drenaje[["peor_drenaje"]])->lista_rasters_drenaje[['resumen_drenaje']]
 
-
+lista_rasters_drenaje[['resumen_drenaje']] |> writeRaster("Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Drenaje/resumen_drenaje.tif")
 
 rasters_agua[[10]]=raster("Inputs/Rasters_Generados_en_R/rasters_app_agua/j_diffsuministro_agua_buena_percepcion_menos_mala_percepcion.tif")
 

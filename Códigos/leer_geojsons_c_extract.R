@@ -7,20 +7,42 @@ st_read("Inputs/Rasters_Generados_en_R/Otros/obras_agua_punto.geojson")|> st_tra
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_drenaje_linea.geojson") |> st_transform(st_crs("EPSG:4326"))->lineas_drenaje
 st_read("Inputs/Rasters_Generados_en_R/Otros/obras_drenaje_punto.geojson")|> st_transform(st_crs("EPSG:4326"))->puntos_drenaje
 
-
+puntos_vialidades_nuevas = st_read("Inputs/Rasters_Generados_en_R/Otros/obras_vial_punto_nueva.geojson")
+lineas_vialidades_nuevas =st_read("Inputs/Rasters_Generados_en_R/Otros/obras_vial_linea_nueva.geojson")
+puntos_vialidades_mejora = st_read("Inputs/Rasters_Generados_en_R/Otros/obras_vial_punto_mejora.geojson")
+lineas_vialidades_mejora = st_read("Inputs/Rasters_Generados_en_R/Otros/obras_vial_linea_mejora.geojson")
 ####Leer obras viales en puntos y lineas
-st_read("Inputs/Rasters_Generados_en_R/Otros/obras_linea_extract.geojson") |> st_transform(st_crs("EPSG:4326"))->lineas_c_extract
-st_read("Inputs/Rasters_Generados_en_R/Otros/obras_punto_extract.geojson")|> st_transform(st_crs("EPSG:4326"))->puntos_c_extract
+# st_read("Inputs/Rasters_Generados_en_R/Otros/obras_linea_extract.geojson") |> st_transform(st_crs("EPSG:4326"))->lineas_c_extract
+# st_read("Inputs/Rasters_Generados_en_R/Otros/obras_punto_extract.geojson")|> st_transform(st_crs("EPSG:4326"))->puntos_c_extract
+# 
+# (lineas_c_extract |> dplyr::filter(grepl(pattern = "Reconstrucci||Mejoram||Rehabili",Obra )))$Obra
+# lineas_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación",
+#                                                                                                                           "Re-encarpetamiento","Reubicación")}) 
+# c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación",
+#   "Re-encarpetamiento","Reubicación")
+# lineas_c_extract$extract[lineas_c_extract$extract |> is.na()]=0
+# 
+# lineas_vialidades_mejora=lineas_c_extract[lineas_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación",
+#                                                                                                                                                                     "Re-encarpetamiento","Reubicación")}) 
+# ,]
+# puntos_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]}) |> unique()
+# puntos_vialidades_mejora=puntos_c_extract[puntos_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación",
+#                                                                                                                                                                     "Re-encarpetamiento","Reubicación")}) 
+# ,]
+# lineas_vialidades_nuevas=lineas_c_extract[lineas_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){!x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación",
+#                                                                                                                                                                     "Re-encarpetamiento","Reubicación")}) 
+# ,]
+# puntos_vialidades_nuevas=puntos_c_extract[puntos_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){!x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación",
+#                                                                                                                                                                     "Re-encarpetamiento","Reubicación")}) 
+# ,]
 
-(lineas_c_extract |> dplyr::filter(grepl(pattern = "Reconstrucci||Mejoram||Rehabili",Obra )))$Obra
-lineas_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación")}) 
-c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación")
-lineas_c_extract$extract[lineas_c_extract$extract |> is.na()]=0
+# puntos_vialidades_nuevas |> st_write("Inputs/Rasters_Generados_en_R/Otros/obras_vial_punto_nueva.geojson",driver = "GeoJSON")
+# lineas_vialidades_nuevas |> st_write("Inputs/Rasters_Generados_en_R/Otros/obras_vial_linea_nueva.geojson",driver = "GeoJSON")
+# puntos_vialidades_mejora |> st_write("Inputs/Rasters_Generados_en_R/Otros/obras_vial_punto_mejora.geojson",driver = "GeoJSON")
+# lineas_vialidades_mejora |> st_write("Inputs/Rasters_Generados_en_R/Otros/obras_vial_linea_mejora.geojson",driver = "GeoJSON")
 
-lineas_vialidades_mejora=lineas_c_extract[lineas_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación")}) 
-,]
-puntos_vialidades_mejora=puntos_c_extract[puntos_c_extract$Obra |> sapply(\(x){(x |> strsplit(split = " "))},simplify = T,USE.NAMES = F) |> sapply(\(x){x[[1]]%in%c("Ampliación","Rehabilitación","Mejoramiento","Modernización","Reconstrucción","Reconstruccíon","Rehabilitacion","Rehabilitación")}) 
-,]
+
+
 generate_labels=function(lineas_seleccionadas,puntos_seleccionadas){
   lineas_labels <- lapply(1:nrow(lineas_seleccionadas), function(i) {
     obra <- lineas_seleccionadas$Obra[i]

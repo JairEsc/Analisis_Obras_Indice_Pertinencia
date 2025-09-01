@@ -7,81 +7,25 @@ library(sf)
 library(sp)
 library(leaflegend)
 library(data.table)
-source("Códigos/raster_base.R")
-source("Códigos/leer_geojsons_c_extract.R")
-source("Códigos/leer_rasters_generados_en_r.R")
+source("Códigos/raster_base.R")##Regresa municipios y base
+source("Códigos/leer_geojsons_c_extract.R") #Regresa funciones generate_labels, update_labels
+                                            #También regresa obras tipo linea y punto de cada tipo de obra
+source("Códigos/leer_rasters_generados_en_r.R") ##Regresa rasters, rasters_list_names
 #rsconnect::writeManifest()
 ####Requerimientos previos. 
-##Modificar el raster 1 (Accesibilidad)
-# origin(rasters[[1]])=origin(rasters[[2]])
-# extent(rasters[[1]])=extent(rasters[[2]])
-# ##Unir servicios
-# rasters[[8]]=min(rasters[[8]],rasters[[9]],na.rm = T)
-# rasters=rasters[c(1:8,10)]
+
 rasters_list_names[8]='Distancia a localidades con bajo acceso a agua entubada o drenaje sanitario'
 rasters_list_names=rasters_list_names[c(1:8,10)]
 ##Definir pesos por default
 
-# z="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Infraestructura educativa/diff_mejor_menos_peor.tif" |> raster()
-# #z[abs(z)<1e-5]=NA
-# z2="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Salud/diff_no_afectado_menos_afectado.tif" |> raster()
-# #z2[abs(z2)<1e-5]=NA
-# z3="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Espacios publicos/diff_no_afectado_menos_afectado.tif" |> raster()
-# #z3[abs(z3)<1e-5]=NA
-# z4="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/diff_buena_percepcion_menos_mala_percepcion.tif" |> raster()
-# #z4[abs(z4)<1e-5]=NA
-
-# z5="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/diff_infraestructura_mejor_menos_peor.tif" |> raster()
-# z5[abs(z5)<1e-5]=NA
-# z_lista=list(z5)
-# library(DescTools)
-# scale_m1_1=function(x){
-#   return (2*((x-raster::minValue(x))/(raster::maxValue(x)-raster::minValue(x))-1/2))
-# }
-# #leaflet() |> addTiles() |> addRasterImage(z_lista[[1]])
-# #raster::maxValue(z5)
-# z_lista=z_lista |> lapply(\(z){(z)|> scale_m1_1()})
-# #z_lista |> lapply(plot)
-# z_lista[[1]][z_lista[[1]] |> is.na()]=0
-# z_lista[[1]]=z_lista[[1]] |> terra::mask(municipios)
 weights= c(0.15,0.13,0,0,0.13,0.17,0.15,0,0.19,0.17)
   #c(9,6,0,0,6,8,7,0,0,11)#c(2*c(9,3,0,0,5,8,7,0,1),0,0,0,0,0)
-#weights=weights/sum(weights)
-##Darles interpretación como en la documentación.
-#weights[1]=-weights[1]
-#weights[3]=-weights[3]
-#weights[10]=-weights[10]
-#weights=-weights
-#Escalar y eliminar outliers
-# for(i in 1:length(rasters)){
-#   raster_vals <- values(rasters[[i]])
-#   raster_vals <- raster_vals[!is.na(raster_vals)]
-# 
-#   q1 <- quantile(raster_vals, 0.25)
-#   q3 <- quantile(raster_vals, 0.75)
-#   iqr <- q3 - q1
-# 
-#   upper_limit <- q3 + 1.5 * iqr
-#   lower_limit <- q1 - 1.5 * iqr
-# 
-#   rasters[[i]] <- clamp(rasters[[i]],
-#                         lower = lower_limit,
-#                         upper = upper_limit,
-#                         useValues=TRUE)
-# }
-# rasters=rasters |> lapply(scale)
-# rasters[[9]][rasters[[9]] |> is.na()]=mean(values(rasters[[9]]) ,na.rm=T)
-# rasters[[9]]=rasters[[9]] |> terra::mask(municipios)
-# rasters[[10]]=z_lista[[1]]
-rasters_list_names[[10]]="Percepción infraestructura vial"
-# rasters=rasters|> lapply(\(x){x
-#   aggregate(x, fact = 3, fun = "mean")})
-# 1:10 |> sapply(\(x){
-#   rasters[[x]] |> writeRaster(paste0("Inputs/Rasters_Generados_en_R/rasters_app/",letters[x],"_",gsub(" ","_",gsub("\n","",rasters_list_names[x])),".tif"),overwrite=T)
-# })
-rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)
-rasters_agua=list.files("Inputs/Rasters_Generados_en_R/rasters_app_agua/",full.names = T) |> lapply(raster)
-rasters_drenaje=list.files("Inputs/Rasters_Generados_en_R/rasters_app_drenaje/",full.names = T) |> lapply(raster)
+
+
+rasters_list_names[[10]]="Percepción infraestructura vial"##Caso por default
+rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)##Definimos rasters del caso base
+rasters_agua=list.files("Inputs/Rasters_Generados_en_R/rasters_app_agua/",full.names = T) |> lapply(raster)#Otro tema
+rasters_drenaje=list.files("Inputs/Rasters_Generados_en_R/rasters_app_drenaje/",full.names = T) |> lapply(raster)#Otro tema
 
 ###UI
 descripciones_minimas=c(
@@ -101,7 +45,7 @@ descripciones_minimas=c(
 ui <- fluidPage(
   tags$head(
     tags$script(src = "https://cdn.tailwindcss.com"),
-    tags$style(HTML("
+    tags$style(HTML({"
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
       body {
         font-family: 'Inter', sans-serif;
@@ -149,9 +93,8 @@ ui <- fluidPage(
       .leaflet-map-container-custom{
         height: 90vh;
       }
-    "))
+    "}))
   ),
-  
   # Contenedor principal para toda la página, centrado y con ancho limitado
   div(class = "container mx-auto p-4 md:p-8 max-w-12xl",
       # Layout principal
@@ -167,23 +110,9 @@ ui <- fluidPage(
               p(class = "text-sm text-gray-600 mb-6", 
                 "Define la influencia de cada uno de los rasters (estandarizados)"),
               
-              # Sliders para los 9 rasters
+              # Sliders para los n rasters
               uiOutput("dynamic_sliders"),
-              # h2(class = "text-2xl font-semibold mb-6 text-gray-800", "Capa de percepción"),
-              # div(class = "mb-4",
-              #     p(class = "input-label", "otro1"),
-              #     sliderInput(
-              #       inputId = paste0("raster_weight_", 10),
-              #       label = NULL, # El label se maneja con el 'p' de arriba
-              #       min = -1,
-              #       max = 1,
-              #       value = weights[10],
-              #       step = 0.01,
-              #       width = "100%"
-              #     )
-              # ),
-              
-              
+
               # Botón para generar el mapa
               div(class = "mt-8 text-center",
                   actionButton(
@@ -215,15 +144,19 @@ rasters_segun_eleccion=rasters
 server <- function(input, output, session) {
   output$second_input_infra_vial=renderUI({
     if(input$select_obras == 'Infraestructura vial'){
-      selectInput(inputId = "select_nuevas_o_reconstrucciones",label="Elegir tipo de obra vial",choices = c("Nuevas","Reconstrucciones")) 
+      selectInput(inputId = "select_nuevas_o_reconstrucciones",label="Elegir tipo de obra vial",choices = c("Construcción","Mejoramiento")) 
     }
     else{div()}
   })
   output$dynamic_sliders <- renderUI({
     
-    titulos_para_sliders <- if (input$select_obras == 'Infraestructura vial') {
+    titulos_para_sliders <- if (input$select_obras == 'Infraestructura vial' & input$select_nuevas_o_reconstrucciones=='Construcción') {
       rasters_list_names
-    } else {
+    }
+    else {
+      if(input$select_obras == 'Infraestructura vial' & input$select_nuevas_o_reconstrucciones=='Mejoramiento'){
+        c(rasters_list_names[1],"Nivel de uso")
+      }
       if(input$select_obras == "Infraestructura Suministro de Agua"){
       nombres_agua <- c(
         rasters_list_names[1:7],

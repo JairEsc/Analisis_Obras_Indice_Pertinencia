@@ -91,13 +91,14 @@ z2="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Salud/dif
 z2[abs(z2)<1e-5]=NA
 z3="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Espacios publicos/diff_no_afectado_menos_afectado.tif" |> raster()
 z3[abs(z3)<1e-5]=NA
-z4="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/diff_buena_percepcion_menos_mala_percepcion.tif" |> raster()
-z4[abs(z4)<1e-5]=NA
-z5="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/infraestructura_percepcion_negativa_carreteras.tif" |> raster()
+z4="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua suministro/resumen_agua_suministro.tif" |> raster()
+z4[abs(z4)<1e-4]=NA
+z5="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Drenaje/resumen_drenaje.tif" |> raster()
 z5[abs(z5)<1e-4]=NA
-z5=-z5
-values(z5)[1]=maxValue(abs(z5))
-z6="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/infraestructura_percepcion_negativa_vialidades.tif" |> raster()
+
+# z5=-z5
+# values(z5)[1]=maxValue(abs(z5))
+z6="Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/infraestructura_percepcion_negativa.tif" |> raster()
 z6[abs(z6)<1e-4]=NA
 
 z6=-z6
@@ -107,12 +108,12 @@ leaflet() |> addTiles()|>
   addRasterImage(z,group='Infraestructura Educativa') |>
   addRasterImage(z2,group='Salud') |>
   addRasterImage(z3,group='Espacios Públicos') |>
-  addRasterImage(z4,group='Agua y servicios públicos') |>
-  addRasterImage(z5,group='Infraestructura Vial (carreteras)') |>
-  addRasterImage(z6,group='Infraestructura Vial (calles y vialidades)') |>
+  addRasterImage(z4,group='Agua (suministro)') |>
+  addRasterImage(z5,group='Drenaje') |>
+  addRasterImage(z6,group='Infraestructura Vial') |>
   
-  addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Escala percepción (negativa - > positiva)', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20,width = 300,labels = '',tickLength = 0) |> addLayersControl(overlayGroups = c('Infraestructura Educativa','Salud','Espacios Públicos','Agua y servicios públicos','Infraestructura Vial (carreteras)','Infraestructura Vial (calles y vialidades)'
-     ),options = layersControlOptions(collapsed = F)) |> hideGroup(c('Salud','Espacios Públicos','Agua y servicios públicos','Infraestructura Vial (carreteras)','Infraestructura Vial (calles y vialidades)'
+  addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Escala percepción (negativa - > positiva)', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20,width = 300,labels = '',tickLength = 0) |> addLayersControl(overlayGroups = c('Infraestructura Educativa','Salud','Espacios Públicos','Agua (suministro)','Drenaje','Infraestructura Vial'
+     ),options = layersControlOptions(collapsed = F)) |> hideGroup(c('Salud','Espacios Públicos','Agua (suministro)','Drenaje','Infraestructura Vial'
      )) 
 ```
 
@@ -127,7 +128,7 @@ library(raster)
 z_lista=list(z,z2,z3,z4,z5,z6)
 rasters_by_cells <- z_lista |> lapply(values)
 rasters_by_cells=rasters_by_cells |> as.data.frame()
-colnames(rasters_by_cells)=c('Infraestructura Educativa','Salud','Espacios Públicos','Agua y servicios públicos','Infraestructura Vial (carreteras)','Infraestructura Vial (calles y vialidades)'
+colnames(rasters_by_cells)=c('Infraestructura Educativa','Salud','Espacios Públicos','Agua (suministro)','Drenaje','Infraestructura Vial'
      )
 cormat <- round(cor(rasters_by_cells,use = "na"),2)
 #head(cormat)

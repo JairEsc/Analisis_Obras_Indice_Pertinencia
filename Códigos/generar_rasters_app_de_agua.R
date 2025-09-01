@@ -134,7 +134,7 @@ lista_rasters_agua |> names() |> lapply(\(x)plot(lista_rasters_agua[[x]],main=pa
 # lista_rasters_agua[["peor5"]] |> writeRaster("Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/princ_prob_estado_drenaje.tif")
 # lista_rasters_agua[["peor6"]] |> writeRaster("Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/princ_prob_estado_escasez_agua.tif")
 # lista_rasters_agua[["peor7"]] |> writeRaster("Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/princ_prob_estado_servicios_publicos.tif")
-lista_rasters_agua[["diff_mejor_menos_peor"]] |> writeRaster("Inputs/Rasters_Generados_en_R/rasters_app_agua/j_diffsuministro_agua_buena_percepcion_menos_mala_percepcion.tif",overwrite=T)
+lista_rasters_agua[["diff_mejor_menos_peor"]] |> writeRaster("Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua suministro/resumen_agua_suministro.tif",overwrite=T)
 
 
 rasters_agua[[10]]=raster("Inputs/Rasters_Generados_en_R/rasters_app_agua/j_diffsuministro_agua_buena_percepcion_menos_mala_percepcion.tif")
