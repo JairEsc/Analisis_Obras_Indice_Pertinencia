@@ -43,21 +43,19 @@ Por lo anterior, se consideran las posibles respuestas para su clasificación ju
 
 -   En.el.último.año...usted.se.vio.afectado.a.por.Falta.de.parques..jardines.o.lugares.de.esparcimiento.cerca.de.su.vivienda."
 
-### Agua y servicios públicos
+### Agua (Suministro)
 
 -   En.el.último.año...usted.se.vio.afectado.a.por.Falta.de.suministro.de.agua.en.la.vivienda."
 
 -   Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo. (Escasez de agua)
 
--   Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo. (Drenaje)
-
--   Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo. (Servicios Públicos)
-
 -   Y...cuál.considera.que.es.el.principal.problema.en.su.colonia.(Agua potable)
+
+### Drenaje
 
 -   Y...cuál.considera.que.es.el.principal.problema.en.su.colonia.(Drenaje)
 
--   Y...cuál.considera.que.es.el.principal.problema.en.su.colonia.(Servicios públicos)
+-   Cuál.considera.que.es.el.principal.problema.que.enfrenta.el.estado.de.Hidalgo. (Drenaje)
 
 ### Infraestructura Vial
 
