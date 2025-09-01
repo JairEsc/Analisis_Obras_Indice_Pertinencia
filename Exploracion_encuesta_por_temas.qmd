@@ -103,15 +103,15 @@ z6=-z6
 values(z6)[1]=maxValue(abs(z6))
 
 leaflet() |> addTiles()|> 
-  addRasterImage(z,group='Infraestructura Educativa') |>
   addRasterImage(z2,group='Salud') |>
   addRasterImage(z3,group='Espacios Públicos') |>
   addRasterImage(z4,group='Agua (suministro)') |>
   addRasterImage(z5,group='Drenaje') |>
   addRasterImage(z6,group='Infraestructura Vial') |>
+  addRasterImage(z,group='Infraestructura Educativa') |>
   
-  addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Escala percepción (negativa - > positiva)', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20,width = 300,labels = '',tickLength = 0) |> addLayersControl(overlayGroups = c('Infraestructura Educativa','Salud','Espacios Públicos','Agua (suministro)','Drenaje','Infraestructura Vial'
-     ),options = layersControlOptions(collapsed = F)) |> hideGroup(c('Salud','Espacios Públicos','Agua (suministro)','Drenaje','Infraestructura Vial'
+  addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Escala percepción (negativa - > positiva)', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20,width = 300,labels = '',tickLength = 0) |> addLayersControl(overlayGroups = c('Salud','Espacios Públicos','Agua (suministro)','Drenaje','Infraestructura Vial','Infraestructura Educativa'
+     ),options = layersControlOptions(collapsed = F)) |> hideGroup(c('Espacios Públicos','Agua (suministro)','Drenaje','Infraestructura Vial','Infraestructura Educativa'
      )) 
 ```
 

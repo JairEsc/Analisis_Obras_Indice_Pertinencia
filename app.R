@@ -157,20 +157,23 @@ server <- function(input, output, session) {
       if(input$select_obras == 'Infraestructura vial' & input$select_nuevas_o_reconstrucciones=='Mejoramiento'){
         c(rasters_list_names[1],"Nivel de uso")
       }
-      if(input$select_obras == "Infraestructura Suministro de Agua"){
-      nombres_agua <- c(
-        rasters_list_names[1:7],
-        "Distancia a localidades con bajo acceso a agua entubada",
-        rasters_list_names[9],
-        "Percepción suministro de agua"
-      )}
-      else{nombres_agua <- c(
-        rasters_list_names[1:7],
-        "Distancia a localidades con bajo acceso a drenaje sanitario",
-        rasters_list_names[9],
-        "Percepción infraestructura de drenaje"
-      )}
-      nombres_agua
+      else{
+        if(input$select_obras == "Infraestructura Suministro de Agua"){
+          nombres_agua <- c(
+            rasters_list_names[1:7],
+            "Distancia a localidades con bajo acceso a agua entubada",
+            rasters_list_names[9],
+            "Percepción suministro de agua"
+          )}
+        else{nombres_agua <- c(
+          rasters_list_names[1:7],
+          "Distancia a localidades con bajo acceso a drenaje sanitario",
+          rasters_list_names[9],
+          "Percepción infraestructura de drenaje"
+        )}
+        nombres_agua
+      }
+      
     }
     descripciones_para_sliders <- if (input$select_obras == 'Infraestructura vial') {
       descripciones_minimas
