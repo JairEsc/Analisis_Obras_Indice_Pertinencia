@@ -148,6 +148,8 @@ lista_rasters_espacios_publicos[["peor1"]] |> writeRaster("Inputs/Rasters_Genera
 lista_rasters_espacios_publicos[["diff_mejor_menos_peor"]] |> writeRaster("Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Espacios publicos/diff_no_afectado_menos_afectado.tif")
 
 
+
+
 lista_rasters_agua=list()
 lista_rasters_agua[["peor1"]]=filtrar_dada_pregunta_y_boolean(2,T)#Ha sido afectado
 lista_rasters_agua[["mejor1"]]=filtrar_dada_pregunta_y_boolean(2,F)#NO Ha sido afectado

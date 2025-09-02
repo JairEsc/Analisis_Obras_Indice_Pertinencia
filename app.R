@@ -10,36 +10,28 @@ library(data.table)
 source("Códigos/raster_base.R")##Regresa municipios y base
 source("Códigos/leer_geojsons_c_extract.R") #Regresa funciones generate_labels, update_labels
                                             #También regresa obras tipo linea y punto de cada tipo de obra
-source("Códigos/leer_rasters_generados_en_r.R") ##Regresa rasters, rasters_list_names
+source("Códigos/leer_rasters_generados_en_r.R") ##Regresa rasters_list_names (default obras viales nuevas)
 #rsconnect::writeManifest()
 ####Requerimientos previos. 
 
-rasters_list_names[8]='Distancia a localidades con bajo acceso a agua entubada o drenaje sanitario'
-rasters_list_names=rasters_list_names[c(1:8,10)]
+raster_accesibilidad="Inputs/Rasters_Generados_en_R/Accesibilidad_cabeceras_negative_scaled.tif" |> raster()
+
 ##Definir pesos por default
 
 weights= c(0.15,0.13,0,0,0.13,0.17,0.15,0,0.19,0.17)
   #c(9,6,0,0,6,8,7,0,0,11)#c(2*c(9,3,0,0,5,8,7,0,1),0,0,0,0,0)
-
-
-rasters_list_names[[10]]="Percepción infraestructura vial"##Caso por default
+rasters_list_names
 rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)##Definimos rasters del caso base
 rasters_agua=list.files("Inputs/Rasters_Generados_en_R/rasters_app_agua/",full.names = T) |> lapply(raster)#Otro tema
 rasters_drenaje=list.files("Inputs/Rasters_Generados_en_R/rasters_app_drenaje/",full.names = T) |> lapply(raster)#Otro tema
+rasters_Espacios_publicos=list.files("Inputs/Rasters_Generados_en_R/rasters_app_espacios_publicos/",full.names = T) |> lapply(raster)#Otro tema
+rasters_salud=list.files("Inputs/Rasters_Generados_en_R/rasters_app_salud/",full.names = T) |> lapply(raster)#Otro tema
+rasters_educacion=list.files("Inputs/Rasters_Generados_en_R/rasters_app_educacion/",full.names = T) |> lapply(raster)#Otro tema
+
+extent(raster_accesibilidad)=extent(rasters[[1]])##Para poder sumarlos
 
 ###UI
-descripciones_minimas=c(
-  "Se mide en distancia. Mayor valor significa más pertinente la obra",
-  "Se mide en distancia. Menor distancia a centros de trabajo significa más pertinente la obra",
-  "Se mide en distancia. Mayor distancia una ANP significa más pertinente la obra",
-  "Se mide en distancia. Menor distancia a escuelas significa más pertinente la obra",
-  "Se mide en distancia. Menor distancia a hospitales significa más pertinente la obra",
-  "Se mide en log-distancia. Menor distancia a hospitales localidades marginadas significa más pertinente la obra",
-  "Se mide en log-distancia. Menor valor significa obra específica de una ZAP. I.e. más pertinente la obra",
-  "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin servicios públicos I.e. más pertinente la obra",
-  "Se mide en porcentaje de votos. Mayor valor significa más votos al partido",
-  "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"
-                        )
+
 
 
 ui <- fluidPage(
@@ -103,7 +95,13 @@ ui <- fluidPage(
           div(class = "lg:col-span-1 panel sliders-responsive",
               div(class='flex',
               h1(class = "text-2xl font-semibold mb-6 text-gray-800", "Análisis de obras:"),
-              selectInput(inputId = "select_obras",label="",choices = c("Infraestructura vial","Infraestructura Suministro de Agua","Infraestructura Drenaje")) 
+              selectInput(inputId = "select_obras",label="",choices = c("Infraestructura vial",
+                                                                        "Infraestructura Suministro de Agua",
+                                                                        "Infraestructura Drenaje",
+                                                                        "Infraestructura Salud", 
+                                                                        "Infraestructura Educación",
+                                                                        "Espacios Públicos"
+                                                                        )) 
               ),uiOutput("second_input_infra_vial"),
               h2(class = "text-2xl font-semibold mb-6 text-gray-800", "Ajustar Pesos de Rasters"),
               
@@ -139,6 +137,101 @@ ui <- fluidPage(
       )
   )
 )
+descripciones_Espacios_Publicos <- c(
+  "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"
+  )
+
+descripciones_educacion <- c(
+  "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra")
+descripciones_salud <- c(
+  "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra")
+
+# Funciones auxiliares actualizadas
+
+generar_lista_titulos <- function(tipo_obra, tipo_vialidad = '') {
+  if (tipo_obra == 'Infraestructura vial') {
+    if (tipo_vialidad == 'Construcción') {
+      return(rasters_list_names)
+    } else {#Mejoramiento
+      return(c(rasters_list_names[1], "Nivel de uso"))
+    }
+  } else if (tipo_obra == "Infraestructura Suministro de Agua") {
+    return(c(rasters_list_names[1:7], "Distancia a localidades con bajo acceso a agua entubada", rasters_list_names[9], "Percepción suministro de agua"))
+  } else if (tipo_obra == "Infraestructura Drenaje") {
+    return(c(rasters_list_names[1:7], "Distancia a localidades con bajo acceso a drenaje sanitario", rasters_list_names[9], "Percepción infraestructura de drenaje"))
+  } else if (tipo_obra == "Espacios Públicos") {
+    return(c(rasters_list_names[1:9],"Percepción de Espacios Públicos"))
+  } else if (tipo_obra == "Infraestructura Educación") {
+    return(c(rasters_list_names[1:9],"Percepción Infraestructura Educativa"))
+  } else if (tipo_obra=='Infraestructura Salud'){
+    return(c(rasters_list_names[1:9],"Percepción Infraestructura Salud"))
+  }
+}
+
+generar_lista_descripciones <- function(tipo_obra, tipo_vialidad = '') {
+  if (tipo_obra == 'Infraestructura vial') {
+    if (tipo_vialidad == 'Construcción') {
+      return(descripciones_minimas)
+    } else {
+      return(c(descripciones_minimas[1], "Se mide en número de viajes. Mayor valor significa más pertinente la obra"))
+    }
+  } else if (tipo_obra == "Infraestructura Suministro de Agua") {
+    return(c(descripciones_minimas[1:7], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra", descripciones_minimas[9], "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
+  } else if (tipo_obra == "Infraestructura Drenaje") {
+    return(c(descripciones_minimas[1:7], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a drenaje sanitario. I.e. más pertinente la obra", descripciones_minimas[9], "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
+  } else if (tipo_obra == "Espacios Públicos") {
+    return(c(descripciones_minimas[1:9],descripciones_Espacios_Publicos[1]))
+  } else if (tipo_obra == "Infraestructura Educación") {
+    return(c(descripciones_minimas[1:9],descripciones_educacion[1]))
+  } else if (tipo_obra=='Infraestructura Salud'){
+    return(c(descripciones_minimas[1:9],descripciones_salud[1]))
+  }
+}
+
+generar_lista_rasters <- function(tipo_obra, tipo_vialidad = '') {
+  if (tipo_obra == 'Infraestructura vial') {
+    if (tipo_vialidad == 'Mejoramiento') {
+      raster_uso <- raster("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif")
+      raster_uso <- ((raster_uso + 1) |> log() |> scale()) #|> aggregate(3)
+      
+      return(list(raster_accesibilidad, -raster_uso)) ##Cambiamos la interpretación de accesibilidad. Debe ser una zona con alta accesibilidad y mucho uso
+    } else {
+      return(rasters)
+    }
+  } else if (tipo_obra == "Infraestructura Suministro de Agua") {
+    return(c(rasters[1:7], rasters_agua[[1]], rasters[[9]], rasters_agua[[2]]))
+  } else if (tipo_obra == "Infraestructura Drenaje") {
+    return(c(rasters[1:7], rasters_drenaje[[1]], rasters[[9]], rasters_drenaje[[2]]))
+  } else if (tipo_obra == "Espacios Públicos") {
+    return(c(rasters[1:9],rasters_Espacios_publicos[[1]]))
+  } else if (tipo_obra == "Infraestructura Educación") {
+    return(c(rasters[1:9],rasters_educacion[[1]]))
+  } else if (tipo_obra=='Infraestructura Salud'){
+    return(c(rasters[1:9],rasters_salud[[1]]))
+  }
+}
+
+# La función para los shapes también se generaliza
+generar_lista_shapes <- function(tipo_obra, tipo_vialidad = '') {
+  if (tipo_obra == 'Infraestructura vial') {
+    if(tipo_vialidad == 'Mejoramiento'){
+      return(list(obras_sipdus_vialidades_mejora_lineas, obras_sipdus_vialidades_mejora_puntos))
+    } else {
+      return(list(obras_sipdus_vialidades_nuevas_lineas, obras_sipdus_vialidades_nuevas_puntos))
+    }
+  } else if (tipo_obra == "Infraestructura Suministro de Agua") {
+    return(list(obras_sipdus_agua_lineas, obras_sipdus_agua_puntos))
+  } else if (tipo_obra == "Infraestructura Drenaje") {
+    return(list(obras_sipdus_drenaje_lineas, obras_sipdus_drenaje_puntos))
+  } else if (tipo_obra == "Espacios Públicos") {
+    return(list(obras_sipdus_espacios_publicos_linea, obras_sipdus_espacios_publicos_punto))
+  } else if (tipo_obra == "Infraestructura Educación") {
+    return(list(obras_sipdus_educacion_linea, obras_sipdus_educacion_punto))
+  } else if (tipo_obra=='Infraestructura Salud'){
+    return(list(obras_sipdus_salud_linea, obras_sipdus_salud_punto))
+  }
+}
+
 ##rasters es una variable global
 rasters_segun_eleccion=rasters
 server <- function(input, output, session) {
@@ -149,113 +242,59 @@ server <- function(input, output, session) {
     else{div()}
   })
   output$dynamic_sliders <- renderUI({
+    titulos <- generar_lista_titulos(input$select_obras, input$select_nuevas_o_reconstrucciones)
+    descripciones <- generar_lista_descripciones(input$select_obras, input$select_nuevas_o_reconstrucciones)
     
-    titulos_para_sliders <- if (input$select_obras == 'Infraestructura vial' & input$select_nuevas_o_reconstrucciones=='Construcción') {
-      rasters_list_names
-    }
-    else {
-      if(input$select_obras == 'Infraestructura vial' & input$select_nuevas_o_reconstrucciones=='Mejoramiento'){
-        c(rasters_list_names[1],"Nivel de uso")
-      }
-      else{
-        if(input$select_obras == "Infraestructura Suministro de Agua"){
-          nombres_agua <- c(
-            rasters_list_names[1:7],
-            "Distancia a localidades con bajo acceso a agua entubada",
-            rasters_list_names[9],
-            "Percepción suministro de agua"
-          )}
-        else{nombres_agua <- c(
-          rasters_list_names[1:7],
-          "Distancia a localidades con bajo acceso a drenaje sanitario",
-          rasters_list_names[9],
-          "Percepción infraestructura de drenaje"
-        )}
-        nombres_agua
-      }
-      
-    }
-    descripciones_para_sliders <- if (input$select_obras == 'Infraestructura vial') {
-      descripciones_minimas
-    } else {
-      if(input$select_obras == "Infraestructura Suministro de Agua"){
-        nombres_agua <- c(
-          descripciones_minimas[1:7],
-          "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra",
-          descripciones_minimas[9],
-          "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"
+    num_rasters <- length(titulos)
+    print(num_rasters)
+    lapply(1:num_rasters, function(i) {
+      div(
+        class = "mb-4",
+        p(class = "input-label", titulos[[i]]),
+        sliderInput(
+          inputId = paste0("raster_weight_", i),
+          label = descripciones[i],
+          min = 0,
+          max = 1,
+          value = weights[i],
+          step = 0.01,
+          width = "100%"
         )
-      }else{
-        nombres_agua <- c(
-          descripciones_minimas[1:7],
-          "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a drenaje sanitario. I.e. más pertinente la obra",
-          descripciones_minimas[9],
-          "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"
-        )
-      }
-      
-      nombres_agua
-    }
-    
-    lapply(1:10, function(i) {
-      div(class = "mb-4",
-          p(class = "input-label", titulos_para_sliders[[i]]),
-          sliderInput(
-            inputId = paste0("raster_weight_", i),
-            label = descripciones_para_sliders[i],
-            min = 0,
-            max = 1,
-            value = weights[i],
-            step = 0.01,
-            width = "100%"
-          )
       )
     })
   })
   
   rasters_seleccionados <- reactive({
-    print(paste0("Estamos usando: ", input$select_obras))
-    
-    if (input$select_obras == 'Infraestructura vial') {
-      rasters_a_usar <- rasters
-    } else {
-      if(input$select_obras == "Infraestructura Suministro de Agua"){
-      rasters_a_usar <- c(rasters[1:7], rasters_agua[[1]], rasters[[9]], rasters_agua[[2]])}
-      else{
-        rasters_a_usar <- c(rasters[1:7], rasters_drenaje[[1]], rasters[[9]], rasters_drenaje[[2]])
-      }
-    }
-    return(rasters_a_usar)
+    generar_lista_rasters(input$select_obras, input$select_nuevas_o_reconstrucciones)
   })
   
   shapes_seleccionados <- reactive({
-    if (input$select_obras == 'Infraestructura vial') {
-      shapes_a_usar <- list(lineas_c_extract, puntos_c_extract)
-    } else {
-      if(input$select_obras == "Infraestructura Suministro de Agua"){
-      shapes_a_usar <- list(lineas_agua, puntos_agua)
-      }
-      else{
-        shapes_a_usar <- list(lineas_drenaje, puntos_drenaje)
-      }
-    }
-    return(shapes_a_usar)
+    generar_lista_shapes(input$select_obras, input$select_nuevas_o_reconstrucciones)
   })
   
   dummy_raster_data <- eventReactive(input$generate_map_button, {
-    current_rasters <- rasters_seleccionados()
-    current_rasters[[1]] <- -current_rasters[[1]]
-    if (length(current_rasters) != 10) {
-      stop("Este es un stop para asegurarme que uní servicios en un solo raster")
+    num_rasters <- if (input$select_obras == 'Infraestructura vial' && input$select_nuevas_o_reconstrucciones=='Mejoramiento') {
+      2
+    } else {
+      10
     }
-    weights <- numeric(10)
-    for (i in 1:10) {
+    
+    current_rasters <- rasters_seleccionados()
+    #current_rasters[[1]] <- -current_rasters[[1]]
+    
+    # if (length(current_rasters) != num_rasters) {
+    #   stop("Este es un stop para asegurarme que uní servicios en un solo raster")
+    # }
+
+    weights <- numeric(num_rasters)
+    print(num_rasters)
+    for (i in 1:num_rasters) {
       weights[i] <- input[[paste0("raster_weight_", i)]]
     }
     print(weights)
     print("Haciendo la suma")
     combined_raster <- Reduce(`+`, Map(`*`, current_rasters , -weights))
-    combined_raster <- combined_raster
+    combined_raster[abs(combined_raster)<1e-4]=NA
     return(combined_raster)
   })
   
@@ -265,10 +304,11 @@ server <- function(input, output, session) {
     puntos_seleccionadas <- shapes_seleccionados()[[2]]
     labels_para_usar <- generate_labels(lineas_seleccionadas, puntos_seleccionadas)
     leaflet() |>
-      addTiles() |>
+      addTiles(options = tileOptions(opacity = 0.8)) |>
       addPolylines(data = lineas_seleccionadas, label = labels_para_usar[[1]], group = 'Obras (líneas)',layerId = 1:nrow(lineas_seleccionadas)) |>
       addMarkers(data = puntos_seleccionadas, label = labels_para_usar[[2]], group = 'Obras (puntos)',layerId = (1+nrow(lineas_seleccionadas)):(nrow(lineas_seleccionadas)+nrow(puntos_seleccionadas))) |>
-      addLayersControl(overlayGroups = c("Pertinencia", 'Obras (líneas)', 'Obras (puntos)'))
+      addLayersControl(overlayGroups = c("Pertinencia", 'Obras (líneas)', 'Obras (puntos)')) |> 
+      leaflet.extras::addSearchFeatures(targetGroups = c('Obras (líneas)','Obras (puntos)'),options = leaflet.extras::searchFeaturesOptions(hideMarkerOnCollapse=T))
   })
   
   observeEvent(input$result_map_marker_click,{
@@ -323,30 +363,20 @@ server <- function(input, output, session) {
       
       print("Inicia el extract")
       
-      z_lineas <- raster::extract(dummy_raster_data(), lineas_a_usar |> st_transform(st_crs("EPSG:32614")),
+      obras_full=puntos_a_usar |> rbind(lineas_a_usar) 
+      z_full <- raster::extract(dummy_raster_data(), obras_full|> st_transform(st_crs("EPSG:32614")),
                                   method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
                                   fun = mean, na.rm = TRUE)
-      z_lineas[is.na(z_lineas)] <- 0
-      lineas_a_usar$extract <- z_lineas
-      
-      z_puntos <- raster::extract(dummy_raster_data(), puntos_a_usar |> st_transform(st_crs("EPSG:32614")),
-                                  method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
-                                  fun = mean, na.rm = TRUE)
-      z_puntos[is.na(z_puntos)] <- 0
-      puntos_a_usar$extract <- z_puntos
+      #z_puntos[is.na(z_puntos)] <- 0
+      obras_full$extract <- z_full
       
       print("termina el extract")
       
-      zz <- rbind(
-        lineas_a_usar |>
+      zz <-
+        obras_full |>
           dplyr::select(Municipio:Ejecutora, Geometria_tipo, extract) |>
           dplyr::rename(indice_pertinencia = extract) |>
-          st_drop_geometry(),
-        puntos_a_usar |>
-          dplyr::select(Municipio:Ejecutora, Geometria_tipo, extract) |>
-          dplyr::rename(indice_pertinencia = extract) |>
-          st_drop_geometry()
-      ) |> dplyr::arrange(dplyr::desc(indice_pertinencia))
+          st_drop_geometry()|> dplyr::arrange(dplyr::desc(indice_pertinencia))
       
       openxlsx::write.xlsx(zz, file, overwrite = TRUE)
     }
