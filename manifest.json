@@ -39,7 +39,7 @@
         "Maintainer": "Kirill Müller <kirill@cynkra.com>",
         "Repository": "CRAN",
         "Date/Publication": "2024-06-02 21:50:02 UTC",
-        "Built": "R 4.5.0; ; 2025-04-10 00:38:30 UTC; windows"
+        "Built": "R 4.5.1; ; 2025-08-20 00:45:13 UTC; windows"
       }
     },
     "DT": {
@@ -1523,6 +1523,34 @@
         "Repository": "CRAN",
         "Date/Publication": "2024-03-26 19:10:06 UTC",
         "Built": "R 4.5.1; ; 2025-07-28 02:15:39 UTC; windows"
+      }
+    },
+    "leaflet.extras": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "leaflet.extras",
+        "Type": "Package",
+        "Title": "Extra Functionality for 'leaflet' Package",
+        "Version": "2.0.1",
+        "Authors@R": "c(\n      person(\"Sebastian\", \"Gatscha\", email = \"sebastian_gatscha@gmx.at\", role = c(\"aut\", \"cre\")),\n      person(\"Bhaskar\", \"Karambelkar\", email = \"bhaskarvk@gmail.com\", role = c(\"aut\")),\n      person(\"Barret\", \"Schloerke\", email = \"barret@rstudio.com\", role = c(\"aut\")),\n      person(\"Bangyou\", \"Zheng\", email= \"Bangyou.Zheng@csiro.au\", role = c(\"ctb\"),\n        comment = \"Leaflet-search and Leaflet-GPS plugin integration\"),\n      person(\"Robin\", \"Cura\", email= \"robin@cura.info\", role = c(\"ctb\"),\n        comment = \"Fixes for Draw Options\"),\n      person(\"Markus\", \"Voge\", email= \"markus.voge@ea-aw.de\", role = c(\"ctb\"),\n        comment = \"Enhancements for Draw Options\"),\n      person(\"Markus\", \"Dumke\", role = c(\"ctb\"), comment = \"Bounce Marker addition\"),\n      person(family = \"Mapbox\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-omnivore, csv2geojson, and togeojson libraries\"),\n      person(\"Henry\", \"Thasler\", role = c(\"ctb\", \"cph\"), comment = \"Leaflet.Geodesic library\"),\n      person(\"Dennis\", \"Wilhelm\", role = c(\"ctb\", \"cph\"), comment = \"Leaflet.StyleEditor library\"),\n      person(\"Kirollos\", \"Risk\", role = c(\"ctb\", \"cph\"), comment = \"fuse.js library\"),\n      person(\"Tim\", \"Wisniewski\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-choropleth library\"),\n      person(family = \"Leaflet\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-draw library\"),\n      person(\"Alexander\", \"Milevski\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-draw-drag library\"),\n      person(\"John\", \"Firebaugh\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-fullscreen library\"),\n      person(\"Stefano\", \"Cudini\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-gps library\"),\n      person(\"Johannes\", \"Rudolph\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-hash library\"),\n      person(\"Per\", \"Liedman\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-measure-path library\"),\n      person(\"Pavel\", \"Shramov\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-plugins library\"),\n      person(\"Filip\", \"Zavadil\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-pulse-icon library\"),\n      person(\"Stefano\", \"Cudini\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-search library\"),\n      person(family = \"CliffCloud\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-sleep library\"),\n      person(family = \"Ursudio\", role = c(\"ctb\", \"cph\"), comment = \"leaflet-webgl-heatmap library\"),\n      person(\"Maxime\", \"Hadjinlian\", role = c(\"ctb\", \"cph\"), comment = \"leaflet.BounceMarker library\"),\n      person(\"Vladimir\", \"Agafonkin\", role = c(\"ctb\", \"cph\"), comment = \"leaflet.heat library\"),\n      person(\"Iván Sánchez\", \"Ortega\", role = c(\"ctb\", \"cph\"), comment = \"leaflet.tilelayer.pouchdbcached library\"),\n      person(\"Dale\", \"Harvey\", role = c(\"ctb\", \"cph\"), comment = \"pouchdb-browser library\"),\n      person(\"Mike\", \"Bostock\", role = c(\"ctb\", \"cph\"), comment = \"topojson library\")\n    )",
+        "Description": "The 'leaflet' JavaScript library provides many plugins some of which\n    are available in the core 'leaflet' package, but there are many more. It is not\n    possible to support them all in the core 'leaflet' package. This package serves\n    as an add-on to the 'leaflet' package by providing extra functionality via 'leaflet'\n    plugins.",
+        "License": "GPL-3 | file LICENSE",
+        "Encoding": "UTF-8",
+        "Depends": "R (>= 3.1.0), leaflet (>= 2.0.0)",
+        "Imports": "htmlwidgets, htmltools, stringr, magrittr",
+        "Suggests": "jsonlite, readr, sf, xfun, testthat (>= 3.0.0)",
+        "URL": "https://github.com/trafficonese/leaflet.extras,\nhttps://trafficonese.github.io/leaflet.extras/",
+        "BugReports": "https://github.com/trafficonese/leaflet.extras/issues",
+        "RoxygenNote": "7.3.1",
+        "Config/testthat/edition": "3",
+        "NeedsCompilation": "no",
+        "Packaged": "2024-08-19 20:41:21 UTC; kona1",
+        "Author": "Sebastian Gatscha [aut, cre],\n  Bhaskar Karambelkar [aut],\n  Barret Schloerke [aut],\n  Bangyou Zheng [ctb] (Leaflet-search and Leaflet-GPS plugin integration),\n  Robin Cura [ctb] (Fixes for Draw Options),\n  Markus Voge [ctb] (Enhancements for Draw Options),\n  Markus Dumke [ctb] (Bounce Marker addition),\n  Mapbox [ctb, cph] (leaflet-omnivore, csv2geojson, and togeojson\n    libraries),\n  Henry Thasler [ctb, cph] (Leaflet.Geodesic library),\n  Dennis Wilhelm [ctb, cph] (Leaflet.StyleEditor library),\n  Kirollos Risk [ctb, cph] (fuse.js library),\n  Tim Wisniewski [ctb, cph] (leaflet-choropleth library),\n  Leaflet [ctb, cph] (leaflet-draw library),\n  Alexander Milevski [ctb, cph] (leaflet-draw-drag library),\n  John Firebaugh [ctb, cph] (leaflet-fullscreen library),\n  Stefano Cudini [ctb, cph] (leaflet-gps library),\n  Johannes Rudolph [ctb, cph] (leaflet-hash library),\n  Per Liedman [ctb, cph] (leaflet-measure-path library),\n  Pavel Shramov [ctb, cph] (leaflet-plugins library),\n  Filip Zavadil [ctb, cph] (leaflet-pulse-icon library),\n  Stefano Cudini [ctb, cph] (leaflet-search library),\n  CliffCloud [ctb, cph] (leaflet-sleep library),\n  Ursudio [ctb, cph] (leaflet-webgl-heatmap library),\n  Maxime Hadjinlian [ctb, cph] (leaflet.BounceMarker library),\n  Vladimir Agafonkin [ctb, cph] (leaflet.heat library),\n  Iván Sánchez Ortega [ctb, cph] (leaflet.tilelayer.pouchdbcached\n    library),\n  Dale Harvey [ctb, cph] (pouchdb-browser library),\n  Mike Bostock [ctb, cph] (topojson library)",
+        "Maintainer": "Sebastian Gatscha <sebastian_gatscha@gmx.at>",
+        "Repository": "CRAN",
+        "Date/Publication": "2024-08-19 22:40:03 UTC",
+        "Built": "R 4.5.0; ; 2025-04-10 02:16:39 UTC; windows"
       }
     },
     "leaflet.providers": {
@@ -3208,31 +3236,55 @@
   },
   "files": {
     ".RData": {
-      "checksum": "6419e564b29fdd9e974a80a24bbfcd0d"
+      "checksum": "07429ed10580382f21a5a8d947ef969a"
+    },
+    ".Rprofile": {
+      "checksum": "f90af0b4dec2f6c94d80ec7879a5415f"
     },
     "app.R": {
-      "checksum": "7005412ce3adbf39c9f0cfcb235a8537"
+      "checksum": "8e5b40274380e3a1f4ea1edc65d3c7ad"
     },
     "Códigos/encuesta_leer_y_funcion_kernel_densidad.R": {
-      "checksum": "494f96bde5e1d6863c0032f7665f35ea"
+      "checksum": "1623cc2e61383bf78c92155bfb6b6cf7"
+    },
+    "Códigos/generar_rasters_app_de_agua.R": {
+      "checksum": "201674ced7a281e16bd19c397cf7ede0"
+    },
+    "Códigos/generar_rasters_app_de_drenaje.R": {
+      "checksum": "2506de761d6f89b124c945f32abec7f8"
+    },
+    "Códigos/generar_rasters_app_de_educacion.R": {
+      "checksum": "cd394b37a4ded00e9ed154ef2430df6c"
+    },
+    "Códigos/generar_rasters_app_de_espacios_publicos.R": {
+      "checksum": "b6095a00d069ee77811177094a7370ec"
+    },
+    "Códigos/generar_rasters_app_de_salud.R": {
+      "checksum": "0603918f89e86c2da603d261f34620f4"
     },
     "Códigos/leer_geojsons_c_extract.R": {
-      "checksum": "448c2507b256c569677aab5d41cd94e4"
+      "checksum": "af0dcf0801f223e1727ce3cbea5b6e77"
+    },
+    "Códigos/leer_obras_sipdus_agua_y_separar_por_tipo_geometria.R": {
+      "checksum": "69343992739705d61df8129aee28215e"
     },
     "Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R": {
-      "checksum": "86896efb9b9edbe1ecdea5872b76500a"
+      "checksum": "f61daf73e446d00d145a6840e0d67f1b"
+    },
+    "Códigos/leer_obras_sipdus_drenaje_y_separar_por_tipo_geometria.R": {
+      "checksum": "305529073f4563ec2a95fa453bd8191b"
     },
     "Códigos/leer_rasters_generados_en_r.R": {
-      "checksum": "87a96b63ebd7129664ce666ffe0f88af"
+      "checksum": "b7873e4c571bb1f26507838274782f16"
     },
     "Códigos/nivel_de_uso_to_raster.R": {
-      "checksum": "40fc8070ad02385b376e3ad4f5c2b12d"
+      "checksum": "951abcb8570ea0a53ae3f67d3fa857cd"
     },
     "Códigos/pre_procesamiento.R": {
       "checksum": "93c5f9a139ec3de2735eb6da50fdc378"
     },
     "Códigos/raster_base.R": {
-      "checksum": "725479f34517d8f986264f26059f98a4"
+      "checksum": "8556bddce3c03299390f630f83f7f92c"
     },
     "Códigos/render_html.R": {
       "checksum": "7df5bc60a064f35acf7715802e5af781"
@@ -3463,112 +3515,13 @@
       "checksum": "13d02e40a4097c30824fdbd6adbbbaba"
     },
     "Exploracion_encuesta_por_temas.html": {
-      "checksum": "9f219b8af75258fe8f16ccd39023e1b4"
+      "checksum": "f9d1d3a02c0dbf2c48de4dc821a4afd7"
     },
     "Exploracion_encuesta_por_temas.qmd": {
-      "checksum": "bebe116e7566c412ea2f90f54baebe5e"
+      "checksum": "6a8ae93d39087b6d177ce96e610a5168"
     },
-    "Exploracion_encuesta_por_temas_files/figure-html/unnamed-chunk-1-1.png": {
-      "checksum": "ff9f7a8b97c1abccd50c6e6a0c432aca"
-    },
-    "Exploracion_encuesta_por_temas_files/figure-html/unnamed-chunk-2-1.png": {
-      "checksum": "ebe1cadff6b6c5fbc89042a2aa5869be"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/bootstrap/bootstrap-icons.css": {
-      "checksum": "2318f137d201fbf51601fa0faba6bef7"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/bootstrap/bootstrap-icons.woff": {
-      "checksum": "1a51dfbe5467607389d603c02a77cd10"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/bootstrap/bootstrap.min.css": {
-      "checksum": "1c7ffb07dbe6c87d96aec056a46f79d6"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/bootstrap/bootstrap.min.js": {
-      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/clipboard/clipboard.min.js": {
-      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/htmltools-fill-0.5.8.1/fill.css": {
-      "checksum": "0c307b2ce7a3fa7f260a0451457c809f"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/htmlwidgets-1.6.4/htmlwidgets.js": {
-      "checksum": "237f59bc086ccf24f39be55311023b91"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/jquery-3.6.0/jquery-3.6.0.js": {
-      "checksum": "2849239b95f5a9a2aea3f6ed9420bb88"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/jquery-3.6.0/jquery-3.6.0.min.js": {
-      "checksum": "8fb8fee4fcc3cc86ff6c724154c49c42"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/jquery-3.6.0/jquery-3.6.0.min.map": {
-      "checksum": "6efc5d663aaacac2024153fa0d4bafcd"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/leaflet-1.3.1/images/layers-2x.png": {
-      "checksum": "4f0283c6ce28e888000e978e537a6a56"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/leaflet-1.3.1/images/layers.png": {
-      "checksum": "a6137456ed160d7606981aa57c559898"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/leaflet-1.3.1/images/marker-icon-2x.png": {
-      "checksum": "401d815dc206b8dc1b17cd0e37695975"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/leaflet-1.3.1/images/marker-icon.png": {
-      "checksum": "2273e3d8ad9264b7daa5bdbf8e6b47f8"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/leaflet-1.3.1/images/marker-shadow.png": {
-      "checksum": "44a526eed258222515aa21eaffd14a96"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/leaflet-1.3.1/leaflet.css": {
-      "checksum": "58da535d4980b4c71b74a41bbee8a510"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/leaflet-1.3.1/leaflet.js": {
-      "checksum": "af438f3b0ec09c81bc8fb9959de88155"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/leaflet-binding-2.2.2/leaflet.js": {
-      "checksum": "7b0d68b050b79c5699a9f361b697b6ef"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/leafletfix-1.0.0/leafletfix.css": {
-      "checksum": "6a38c873de948d8a1458ec0429aa0063"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/proj4-2.6.2/proj4.min.js": {
-      "checksum": "4c6ef5a940694e1acc5c9ef66572fa79"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js": {
-      "checksum": "4c72a5a790e066510f9eb68541280646"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/quarto-contrib/glightbox/glightbox.min.css": {
-      "checksum": "9b438b29cef1c212d1c65a877ffc7232"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/quarto-contrib/glightbox/glightbox.min.js": {
-      "checksum": "2b4c8cbaade24ecb58bcb0d89694ccee"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/quarto-contrib/glightbox/lightbox.css": {
-      "checksum": "aeee60b3000dd0cfd24fea7e4a62aee7"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/quarto-html/anchor.min.js": {
-      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/quarto-html/popper.min.js": {
-      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/quarto-html/quarto-syntax-highlighting.css": {
-      "checksum": "ab2b9e94a89b131e869fd951d6355545"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/quarto-html/quarto.js": {
-      "checksum": "7563d37e31580c9573af5b12aa3779a2"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/quarto-html/tippy.css": {
-      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/quarto-html/tippy.umd.min.js": {
-      "checksum": "d828775275749701b48bd9d958814111"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/rstudio_leaflet-1.3.1/images/1px.png": {
-      "checksum": "978c1bee49d7ad5fc1a4d81099b13e18"
-    },
-    "Exploracion_encuesta_por_temas_files/libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css": {
-      "checksum": "49b23a276edf8677e7bb779525d2be7d"
+    "Exploracion_encuesta_por_temas.rmarkdown": {
+      "checksum": "1df4e13c715c3c6384f22c639fffe975"
     },
     "Inputs/Drive/ANP.rar": {
       "checksum": "5fca1f733b41861eb1dc0aba6ab6d655"
@@ -3945,6 +3898,9 @@
     "Inputs/Rasters_Generados_en_R/Accesibilidad_cabeceras_mun_dissagregate.tif": {
       "checksum": "6e3d954233333e0b8e043faa23f24f92"
     },
+    "Inputs/Rasters_Generados_en_R/Accesibilidad_cabeceras_negative_scaled.tif": {
+      "checksum": "26b93166237add9259bc7527b5907fb2"
+    },
     "Inputs/Rasters_Generados_en_R/centros_trabajo_raster_distance.tif": {
       "checksum": "8fec2398e7988257ee2319a713441a17"
     },
@@ -3969,11 +3925,20 @@
     "Inputs/Rasters_Generados_en_R/Otros/EncuestaGober2025_filtracion.geojson": {
       "checksum": "fd4896a30e9a998a3e533577f2d84d67"
     },
-    "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua y servicios publicos/diff_buena_percepcion_menos_mala_percepcion.tif": {
-      "checksum": "d51e5956834c15744de40ee09a2535b7"
+    "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua suministro/j_drenaje_mala_percepcion.tif": {
+      "checksum": "96b364f834a494f8a2e935989852101c"
     },
-    "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/diff_infraestructura_mejor_menos_peor.tif": {
-      "checksum": "402a72bf3b2e2af2c446b15a06688ecb"
+    "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Agua suministro/resumen_agua_suministro.tif": {
+      "checksum": "bc8f27525b9707252836b0bc36d60fa8"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Carreteras/infraestructura_percepcion_negativa.tif": {
+      "checksum": "6703bea742fbb25d9560d2d00271bc21"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Drenaje/j_diffsuministro_agua_buena_percepcion_menos_mala_percepcion.tif": {
+      "checksum": "c515dbd4fc4a9c85f4845d728e0268ae"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Drenaje/resumen_drenaje.tif": {
+      "checksum": "2cf121e9a0d11f58b77df4d5d31c4723"
     },
     "Inputs/Rasters_Generados_en_R/Otros/exploracion_encuesta/Por temas/Espacios publicos/diff_no_afectado_menos_afectado.tif": {
       "checksum": "92a842419dd0350e58eb5650eb081cbf"
@@ -4057,13 +4022,49 @@
       "checksum": "3084105041faa12375bbd7eacba3c816"
     },
     "Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif": {
-      "checksum": "ad8c0a5259ef73e4850175da50aee9bc"
+      "checksum": "c88ff4523c3d3aa2a96638a68f2d8864"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_agua_linea.geojson": {
+      "checksum": "7b76ced4f37d3c6c6558d9e1a62957a4"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_agua_punto.geojson": {
+      "checksum": "78aaeb089681efc1e35669822073332e"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_drenaje_linea.geojson": {
+      "checksum": "f6e8c4a8502e9f5a90705420cb27d58a"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_drenaje_punto.geojson": {
+      "checksum": "c9afe22fa0468fb52cc9a65817fc602a"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_educacion_punto.geojson": {
+      "checksum": "99a6926ddf48cbad58651b9948be3b8a"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_espacios_publicos_linea.geojson": {
+      "checksum": "b95c83e9010e63edf278042191b8d0d7"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_espacios_publicos_punto.geojson": {
+      "checksum": "51ca0d2d2a51e789efe551d636e30819"
     },
     "Inputs/Rasters_Generados_en_R/Otros/obras_linea_extract.geojson": {
       "checksum": "32596470974a583b2bd41114ab99f797"
     },
     "Inputs/Rasters_Generados_en_R/Otros/obras_punto_extract.geojson": {
       "checksum": "675d6ad1ef5a88831a0581d98103b7b2"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_salud_punto.geojson": {
+      "checksum": "abd7ce5f425747226b41bf946be3565e"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_vial_linea_mejora.geojson": {
+      "checksum": "09c92b47d4fc27597de0629101eda95f"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_vial_linea_nueva.geojson": {
+      "checksum": "089248fbc36454447ea34b13042442cf"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_vial_punto_mejora.geojson": {
+      "checksum": "e70cae130005ed9654140e4d9d4a0626"
+    },
+    "Inputs/Rasters_Generados_en_R/Otros/obras_vial_punto_nueva.geojson": {
+      "checksum": "10a4b089dd17fa8ca9bcbef016184220"
     },
     "Inputs/Rasters_Generados_en_R/Otros/pertinencia_default.tif": {
       "checksum": "3509f2cb3ea23e6a998f88b4fa4eb9a4"
@@ -4081,7 +4082,7 @@
       "checksum": "73a0a5b74cd3059e521b9424373b13a7"
     },
     "Inputs/Rasters_Generados_en_R/rasters_app/c_Áreas_Naturales_Protegidas_(Distancia).tif": {
-      "checksum": "44f8aee30573360733c7885beec285e0"
+      "checksum": "e92dbedcd4fd3c582698fbfc3f5f290a"
     },
     "Inputs/Rasters_Generados_en_R/rasters_app/d_Distancia_a_Escuelas.tif": {
       "checksum": "7be344fe831b91eb4df2d66db2f288e1"
@@ -4103,6 +4104,27 @@
     },
     "Inputs/Rasters_Generados_en_R/rasters_app/j_Percepción_infraestructura_vial.tif": {
       "checksum": "b2eed9d7db2e58be79b2734760f764e6"
+    },
+    "Inputs/Rasters_Generados_en_R/rasters_app_agua/h_Distancia_a_localidades_con_bajo_acceso_a_agua_potable.tif": {
+      "checksum": "b1d336101e1cc2522096f87018e4b248"
+    },
+    "Inputs/Rasters_Generados_en_R/rasters_app_agua/j_diffsuministro_agua_buena_percepcion_menos_mala_percepcion.tif": {
+      "checksum": "c515dbd4fc4a9c85f4845d728e0268ae"
+    },
+    "Inputs/Rasters_Generados_en_R/rasters_app_drenaje/h_Distancia_a_localidades_con_bajo_acceso_a_drenaje.tif": {
+      "checksum": "20d7350e0a63f0f5acbd14d75ebfed91"
+    },
+    "Inputs/Rasters_Generados_en_R/rasters_app_drenaje/j_drenaje_mala_percepcion.tif": {
+      "checksum": "96b364f834a494f8a2e935989852101c"
+    },
+    "Inputs/Rasters_Generados_en_R/rasters_app_educacion/j_percepcion_infra_edu.tif": {
+      "checksum": "55fa72964222f180b8e61ae838f1067f"
+    },
+    "Inputs/Rasters_Generados_en_R/rasters_app_espacios_publicos/j_percepcion_parques_y_jardines.tif": {
+      "checksum": "225afa99d930ad1fa8f0ad8cd06a5565"
+    },
+    "Inputs/Rasters_Generados_en_R/rasters_app_salud/j_pprecepcion_infraestructura_salud.tif": {
+      "checksum": "545928fff6dad87562122ef84c0b71eb"
     },
     "Inputs/Rasters_Generados_en_R/Secciones_electorales_prioritarias_slice_top_p_mun.tif": {
       "checksum": "91fa6f6ec69708075c9124649fc47b0f"

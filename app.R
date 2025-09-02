@@ -1,6 +1,7 @@
 library(shiny)
 library(shinybusy)
-library(leaflet) # Necesario para el output del mapa
+library(leaflet)
+library(leaflet.extras) 
 library(terra)
 library(raster)
 library(sf)
