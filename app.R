@@ -350,7 +350,7 @@ server <- function(input, output, session) {
   
   output$download_excel <- downloadHandler(
     filename = function() {
-      paste0("listado_obras", Sys.Date(),input$select_obras, ".xlsx")
+      paste0("listado_obras", Sys.Date(), input$select_obras, ".xlsx")
     },
     content = function(file) {
       req(dummy_raster_data())
@@ -359,24 +359,47 @@ server <- function(input, output, session) {
       lineas_a_usar <- shapes_seleccionados()[[1]]
       puntos_a_usar <- shapes_seleccionados()[[2]]
       
-      print("Inicia el extract")
+      lista_resultados <- list()
       
-      obras_full=puntos_a_usar |> rbind(lineas_a_usar) 
-      z_full <- raster::extract(dummy_raster_data(), obras_full|> st_transform(st_crs("EPSG:32614")),
-                                  method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
-                                  fun = mean, na.rm = TRUE)
-      #z_puntos[is.na(z_puntos)] <- 0
-      obras_full$extract <- z_full
+      # Procesar líneas si existen
+      if (nrow(lineas_a_usar) > 0) {
+        z_lineas <- raster::extract(dummy_raster_data(), lineas_a_usar |> st_transform(st_crs("EPSG:32614")),
+                                    method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
+                                    fun = mean, na.rm = TRUE)
+        lineas_df <- lineas_a_usar |>
+          dplyr::select(Municipio:Ejecutora, Geometria_tipo) |>
+          st_drop_geometry() |>
+          dplyr::mutate(indice_pertinencia = z_lineas)
+        lista_resultados[[length(lista_resultados) + 1]] <- lineas_df
+      }
       
-      print("termina el extract")
+      # Procesar puntos si existen
+      if (nrow(puntos_a_usar) > 0) {
+        z_puntos <- raster::extract(dummy_raster_data(), puntos_a_usar |> st_transform(st_crs("EPSG:32614")),
+                                    method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
+                                    fun = mean, na.rm = TRUE)
+        puntos_df <- puntos_a_usar |>
+          dplyr::select(Municipio:Ejecutora, Geometria_tipo) |>
+          st_drop_geometry() |>
+          dplyr::mutate(indice_pertinencia = z_puntos)
+        lista_resultados[[length(lista_resultados) + 1]] <- puntos_df
+      }
       
-      zz <-
-        obras_full |>
-          dplyr::select(Municipio:Ejecutora, Geometria_tipo, extract) |>
-          dplyr::rename(indice_pertinencia = extract) |>
-          st_drop_geometry()|> dplyr::arrange(dplyr::desc(indice_pertinencia))
-      
-      openxlsx::write.xlsx(zz, file, overwrite = TRUE)
+      # Combinar los resultados si hay alguno
+      if (length(lista_resultados) > 0) {
+        zz <- do.call(rbind, lista_resultados) |>
+          dplyr::arrange(dplyr::desc(indice_pertinencia))
+        
+        openxlsx::write.xlsx(zz, file, overwrite = TRUE)
+      } else {
+        # Si no hay obras para el tipo de obra, crear un archivo vacío o con un mensaje
+        warning("No se encontraron obras para el tipo seleccionado.")
+        df_vacio <- data.frame(
+          Mensaje = "No hay obras de este tipo",
+          stringsAsFactors = FALSE
+        )
+        openxlsx::write.xlsx(df_vacio, file, overwrite = TRUE)
+      }
     }
   )
 }

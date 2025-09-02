@@ -39,6 +39,8 @@ bibliography: references.bib
 
 -   Distancia a localidades con bajo acceso a drenaje sanitario (@nicoletti2023disadvantaged)
 
+-   Percepción pública a partir de encuesta de aprobación georeferenciada
+
 ## Preprocesamiento y exploración
 
 Se definen rasters
@@ -53,14 +55,28 @@ library(viridis)
 library(htmlwidgets)
 library(slickR)
 source("Códigos/leer_rasters_generados_en_r.R")
+rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)##Definimos rasters del caso base
+rasters_agua=list.files("Inputs/Rasters_Generados_en_R/rasters_app_agua/",full.names = T) |> lapply(raster)#Otro tema
+rasters_drenaje=list.files("Inputs/Rasters_Generados_en_R/rasters_app_drenaje/",full.names = T) |> lapply(raster)#Otro tema
+rasters_Espacios_publicos=list.files("Inputs/Rasters_Generados_en_R/rasters_app_espacios_publicos/",full.names = T) |> lapply(raster)#Otro tema
+rasters_salud=list.files("Inputs/Rasters_Generados_en_R/rasters_app_salud/",full.names = T) |> lapply(raster)#Otro tema
+rasters_educacion=list.files("Inputs/Rasters_Generados_en_R/rasters_app_educacion/",full.names = T) |> lapply(raster)#Otro tema
+rasters_full=c(rasters[c(1:7,9,10)],rasters_agua[1:2],rasters_drenaje[1:2],rasters_Espacios_publicos[[1]],rasters_salud[[1]],rasters_educacion[[1]])
+rasters_list_names_full=c(rasters_list_names[c(1:7,9,10)],
+                          "Distancia a localidades con bajo acceso a agua entubada","Percepción suministro de agua",
+                          "Distancia a localidades con bajo acceso a drenaje sanitario","Percepción infraestructura de drenaje",
+                   "Percepción de Espacios Públicos","Percepción Infraestructura Educativa",   "Percepción Infraestructura Salud"    )
+
+rasters_full[[3]]=-rasters_full[[3]]
+values(rasters_full[[13]])[1]=maxValue(abs(rasters_full[[13]]))
 raster_plots <- list()
-  for (i in 1:length(rasters)){
+  for (i in 1:length(rasters_full)){
     # Crear un archivo PNG temporal para cada gráfico
     temp_file <- tempfile(fileext = ".png")
     png(temp_file, width = 600, height = 400)
-    plot(rasters[[i]],
+    plot(rasters_full[[i]],
          col = viridis(256),
-         legend = TRUE,main=rasters_list_names[i])
+         legend = TRUE,main=rasters_list_names_full[i])
     dev.off()
     raster_plots[[i]] <- temp_file
   }
@@ -89,61 +105,6 @@ source("Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R")
 #library(crosstalk)
 library(leaflet)
 library(DT)
-#library(dplyr)
-#library(reactable)
-
-#obras_sipdus_carretera_multipunto es un sf de puntos
-#obras_sipdus_carretera_multilinea es un sf de lineas
-
-# SharedData_multipoint =SharedData$new(obras_sipdus_carretera_multipunto|> as("Spatial"), group = "obras_sipdus")
-#  SharedData_multilinea <- SharedData$new(obras_sipdus_carretera_linea  |> as("Spatial"), group = "obras_sipdus")
-
-#SharedData_multilinea+SharedData_multipoint deberían ser un mismo SharedData tipo lista y que se pueda acceder a cada uno como SharedData[[1]] y SharedData[[2]]
-
-# A regular data frame (without coordinates) for the table.
-# obras_sipdus_tabla <- as_tibble(
-#   obras_sipdus_carretera#Notar que este incluye tanto lineas como puntos
-#                                 )|> dplyr::select(ID_OBRA,Municipio,Rubro,Ejercicio,
-#                                                                             #Obra,
-#                                                                             Inversión,Habitantes.beneficiados,Ejecutora,Geometria_tipo) |> 
-#   SharedData$new(group = "obras_sipdus")
-# 
-# map <- leaflet() |> addTiles(options = leaflet::tileOptions(opacity = 0.5)) |> 
-#   addRasterImage(rasters[[1]],opacity = 0.5,group = "Accesibilidad") |>
-#   addRasterImage(rasters[[2]],opacity = 0.5,group = "Distancia centros de trabajo") |>
-#   addRasterImage(rasters[[3]],opacity = 0.5,group = "Distancia áreas naturales protegidas") |>
-#   addRasterImage(rasters[[4]],opacity = 0.5,group = "Distancia Escuelas") |>
-#   addRasterImage(rasters[[5]],opacity = 0.5,group = "Distancia Hospitales") |>
-#   addRasterImage(rasters[[6]],opacity = 0.5,group = "Distancia a localidades marginadas") |>
-#   addRasterImage(rasters[[7]],opacity = 0.5,group = "Distancia a ZAP") |>
-#   addPolylines(data=SharedData_multilinea
-#                ,group = "Obras_tipo_linea"
-#                ,label = obras_sipdus_carretera_linea$Obra
-#   ) |>
-#   # addMarkers(data=obras_sipdus_carretera_punto,group = "Obras_tipo_punto",
-#   #            label = obras_sipdus_carretera_punto$Obra) |>
-#   addMarkers(data=SharedData_multipoint,group = "Obras_tipo_multipunto",
-#              label = obras_sipdus_carretera_multipunto$Obra) |>
-#   addLayersControl(overlayGroups = c("Accesibilidad",
-#                                      "Distancia centros de trabajo",
-#                                      "Distancia áreas naturales protegidas",
-#                                      "Distancia Escuelas",
-#                                      "Distancia Hospitales",
-#                                      "Distancia a localidades marginadas",
-#                                      "Distancia a ZAP"
-#                                      ,"Obras_tipo_linea","Obras_tipo_multilinea","Obras_tipo_multipunto"))
-# 
-# tbl <- reactable(
-#   obras_sipdus_tabla,
-#   selection = "multiple",
-#   onClick = "select",
-#   rowStyle = list(cursor = "pointer"),
-#   minRows = 10,filterable = T,showPageSizeOptions = T,highlight = T,striped = T,showSortIcon = T
-# )
-# 
-# htmltools::browsable(
-#   htmltools::tagList(map, tbl)
-# )
 
 ```
 
@@ -154,40 +115,38 @@ library(DT)
 #| warning: false
 library(leaflegend)
 leaflet() |> addTiles(options = leaflet::tileOptions(opacity = 0.5)) |>
-  addRasterImage(rasters[[1]],opacity = 0.4,group = "Accesibilidad") |>
-  addRasterImage(rasters[[2]],opacity = 0.4,group = "Distancia centros de trabajo") |>
-  addRasterImage(rasters[[3]],opacity = 0.4,group = "Distancia áreas naturales protegidas") |>
-  addRasterImage(rasters[[4]],opacity = 0.4,group = "Distancia Escuelas") |>
-  addRasterImage(rasters[[5]],opacity = 0.4,group = "Distancia Hospitales") |>
-  addRasterImage(rasters[[6]],opacity = 0.4,group = "Distancia a localidades marginadas") |>
-  addRasterImage(rasters[[7]],opacity = 0.4,group = "Distancia a ZAP") |>
-  addRasterImage(rasters[[8]],opacity = 0.4,group = "Dist. loc. bajo acceso agua entubada") |>
-  addRasterImage(rasters[[9]],opacity = 0.4,group = "Dist. loc. bajo acceso drenaje") |>
-  addRasterImage(rasters[[10]],opacity = 0.4,group = "Secciones electorales") |>
-  addPolylines(data=obras_sipdus_carretera_linea
-               ,group = "Obras_tipo_linea"
-               ,label = obras_sipdus_carretera_linea$Obra
-  ) |>
-  # addMarkers(data=obras_sipdus_carretera_punto,group = "Obras_tipo_punto",
-  #            label = obras_sipdus_carretera_punto$Obra) |>
-  addMarkers(data=obras_sipdus_carretera_punto,group = "Obras_tipo_multipunto",
-             label = obras_sipdus_carretera_punto$Obra) |>
-  addLayersControl(overlayGroups = c("Accesibilidad",
-                                     "Distancia centros de trabajo",
-                                     "Distancia áreas naturales protegidas",
-                                     "Distancia Escuelas",
-                                     "Distancia Hospitales",
-                                     "Distancia a localidades marginadas",
-                                     "Distancia a ZAP","Dist. loc. bajo acceso agua entubada","Dist. loc. bajo acceso drenaje","Secciones electorales",
-                                     "Obras_tipo_linea","Obras_tipo_multipunto")) |> addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Valores de rasters', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = '',tickLength = 0) 
+  addRasterImage(rasters_full[[1]],opacity = 0.4,group = rasters_list_names_full[[1]]) |>
+  addRasterImage(rasters_full[[2]],opacity = 0.4,group = rasters_list_names_full[[2]]) |>
+  addRasterImage(rasters_full[[3]],opacity = 0.4,group = rasters_list_names_full[[3]]) |>
+  addRasterImage(rasters_full[[4]],opacity = 0.4,group = rasters_list_names_full[[4]]) |>
+  addRasterImage(rasters_full[[5]],opacity = 0.4,group = rasters_list_names_full[[5]]) |>
+  addRasterImage(rasters_full[[6]],opacity = 0.4,group = rasters_list_names_full[[6]]) |>
+  addRasterImage(rasters_full[[7]],opacity = 0.4,group = rasters_list_names_full[[7]]) |>
+  addRasterImage(rasters_full[[8]],opacity = 0.4,group = rasters_list_names_full[[8]]) |>
+  addRasterImage(rasters_full[[9]],opacity = 0.4,group = rasters_list_names_full[[9]]) |>
+  addRasterImage(rasters_full[[10]],opacity = 0.4,group = rasters_list_names_full[[10]]) |>
+  addRasterImage(rasters_full[[11]],opacity = 0.4,group = rasters_list_names_full[[11]]) |>
+  addRasterImage(rasters_full[[12]],opacity = 0.4,group = rasters_list_names_full[[12]]) |>
+  addRasterImage(rasters_full[[13]],opacity = 0.4,group = rasters_list_names_full[[13]]) |>
+  addRasterImage(rasters_full[[14]],opacity = 0.4,group = rasters_list_names_full[[14]]) |>
+  addRasterImage(rasters_full[[15]],opacity = 0.4,group = rasters_list_names_full[[15]]) |>
+  addRasterImage(rasters_full[[16]],opacity = 0.4,group = rasters_list_names_full[[16]]) |> 
+# |> 
+#   
+#   # addMarkers(data=obras_sipdus_carretera_punto,group = "Obras_tipo_punto",
+#   #            label = obras_sipdus_carretera_punto$Obra) |>
+#   addMarkers(data=obras_sipdus_punto,group = "Obras_tipo_multipunto",
+#              label = obras_sipdus_punto$Obra) 
+
+  addLayersControl(overlayGroups = rasters_list_names_full) |> addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Valores de rasters', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = '',tickLength = 0)
 ```
 
 ```{r}
 #| echo: false
 library(DT)
-datatable(obras_sipdus_carretera |> 
+datatable(obras_sipdus|> 
             dplyr::select(ID_OBRA, Municipio, Rubro, Ejercicio, Inversión, Habitantes.beneficiados, Ejecutora, Obra) |> 
-            st_drop_geometry()|>dplyr::rename(`Obra (breve Descripción)`=Obra) |> 
+            st_drop_geometry()|>dplyr::rename(Obra_breve_Descripcion=Obra) |> 
             dplyr::rename(Habitantes_beneficiados=Habitantes.beneficiados), 
           options = list(
             pageLength = 5,
@@ -200,7 +159,7 @@ datatable(obras_sipdus_carretera |>
 
 ```
 
-De todas maneras, aún debemos establecer la interpretación de cada raster, hacer un escalamiento apropiado y definir los pesos de cada raster que definirán la pertinencia de obras.
+De todas maneras, aún debemos establecer la interpretación de cada raster, hacer un escalamiento apropiado y definir los pesos de cada criterio que definirán la pertinencia de obras.
 
 ```{r}
 #| echo: false
@@ -212,28 +171,13 @@ library(viridis)
 library(htmlwidgets)
 library(slickR)
 rasters_list_names_interpretaciones=rasters_list_names |> as.list()
+
+rasters_list_names_full=c(rasters_list_names[c(1:7,9,10)],
+                          "Distancia a localidades con bajo acceso a agua entubada","Percepción suministro de agua",
+                          "Distancia a localidades con bajo acceso a drenaje sanitario","Percepción infraestructura de drenaje",
+                   "Percepción de Espacios Públicos","Percepción Infraestructura Educativa",   "Percepción Infraestructura Salud"    )
 rasters_list_names_interpretaciones[[1]]=paste0(rasters_list_names_interpretaciones[[1]],
           "-------\n Dado que la distancia se mide en minutos, mayor valor de accesibilidad indica lugares de difícil acceso, en tal caso, un valor alto de accesibilidad indica más pertinencia de obras carreteras.")
-
-rasters_list_names_interpretaciones[[2]]=paste0(rasters_list_names_interpretaciones[[2]],
-          "-------\n Una distancia corta a centros de trabajo se interpreta como un incentivo a la productividad local, fortaleciendo su acceso y su movilidad. En este caso, la interpretación de distancia sería inversa a la pertinencia.")
-
-rasters_list_names_interpretaciones[[3]]=paste0(rasters_list_names_interpretaciones[[3]],
-          "-------\n Aunque no todas las ANP tienen carácter restictivo, la norma general es la preservación por lo que menor distancia a una ANP debería ser interpretado como baja pertinencia")
-rasters_list_names_interpretaciones[[4]]=paste0(rasters_list_names_interpretaciones[[4]],
-          "-------\n La interpretación es equivalente a la de centros de trabajo. Obras de infraestructura carretera y vialidades urbanas cerca de escuelas se interpreta como un refuerzo a su accesibilidad y movilidad. En este caso, la interpretación de distancia sería inversa a la pertinencia.")
-rasters_list_names_interpretaciones[[5]]=paste0(rasters_list_names_interpretaciones[[5]],
-          "-------\n La interpretación es equivalente a la de centros de trabajo y escuelas. Obras de infraestructura carretera y vialidades urbanas cerca de hospitales y centros de salud se interpreta como un refuerzo a su accesibilidad y movilidad. En este caso, la interpretación de distancia sería inversa a la pertinencia.")
-rasters_list_names_interpretaciones[[6]]=paste0(rasters_list_names_interpretaciones[[6]],
-          "-------\n Dado que tenemos identificadas las localidades (polígonos y puntos) de alto y muy alto grado de marginación, se puede establecer la medida del grado de marginación en los asentamientos humanos en general, y la distancia de una obra al asentamiento dado. En tal caso, la distancia de las localidades marginadas sería inversa a la pertinencia.")
-rasters_list_names_interpretaciones[[7]]=paste0(rasters_list_names_interpretaciones[[7]],
-          "-------\n La interpretación de las zonas de atención prioritaria es equivalente a la de localidades marginadas, con la diferencia de utilizar diferentes criterios para determinar la clasificación de cada zona. En tal caso, la distancia de las zonas de atención prioritaria sería inversa a la pertinencia.")
-rasters_list_names_interpretaciones[[8]]=paste0(rasters_list_names_interpretaciones[[8]],
-          "-------\n Bajo acceso a agua entubada y acceso a drenaje sanitario se definen a partir de límites inferiores dados por cuantiles de los datos a nivel de localidad. Posteriormente se calcula la distancia a las localidades. En tal caso, un valor bajo indica una mayor pertinencia, pues está relacionado a localidades en carencia. ")
-rasters_list_names_interpretaciones[[9]]=paste0(rasters_list_names_interpretaciones[[9]],
-          "-------\n Bajo acceso a agua entubada y acceso a drenaje sanitario se definen a partir de límites inferiores dados por cuantiles de los datos a nivel de localidad. Posteriormente se calcula la distancia a las localidades. En tal caso, un valor bajo indica una mayor pertinencia, pues está relacionado a localidades en carencia. ")
-rasters_list_names_interpretaciones[[10]]=paste0(rasters_list_names_interpretaciones[[10]],
-          "-------\n Para las secciones electorales, se aprovecha el hecho de definir una partición geográfica. En este caso se calcula el porcentaje de votos al partido por cada sección para definir el raster. La interpretación natural es el de incentivar, ya sea para reforzar votos futuros en secciones ya ganadas, o para lograr un porcentaje mayor en secciones perdidas. ")
 
 
 ```
