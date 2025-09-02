@@ -150,7 +150,7 @@ descripciones_salud <- c(
 
 generar_lista_titulos <- function(tipo_obra, tipo_vialidad = '') {
   if (tipo_obra == 'Infraestructura vial') {
-    if (tipo_vialidad == 'Construcción') {
+    if (is.null(tipo_vialidad) || tipo_vialidad == 'Construcción') {
       return(rasters_list_names)
     } else {#Mejoramiento
       return(c(rasters_list_names[1], "Nivel de uso"))
@@ -170,7 +170,7 @@ generar_lista_titulos <- function(tipo_obra, tipo_vialidad = '') {
 
 generar_lista_descripciones <- function(tipo_obra, tipo_vialidad = '') {
   if (tipo_obra == 'Infraestructura vial') {
-    if (tipo_vialidad == 'Construcción') {
+    if (is.null(tipo_vialidad) || tipo_vialidad == 'Construcción') {
       return(descripciones_minimas)
     } else {
       return(c(descripciones_minimas[1], "Se mide en número de viajes. Mayor valor significa más pertinente la obra"))
@@ -190,7 +190,7 @@ generar_lista_descripciones <- function(tipo_obra, tipo_vialidad = '') {
 
 generar_lista_rasters <- function(tipo_obra, tipo_vialidad = '') {
   if (tipo_obra == 'Infraestructura vial') {
-    if (tipo_vialidad == 'Mejoramiento') {
+    if (is.null(tipo_vialidad) || tipo_vialidad == 'Construcción') {
       raster_uso <- raster("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif")
       raster_uso <- ((raster_uso + 1) |> log() |> scale()) #|> aggregate(3)
       
@@ -214,7 +214,7 @@ generar_lista_rasters <- function(tipo_obra, tipo_vialidad = '') {
 # La función para los shapes también se generaliza
 generar_lista_shapes <- function(tipo_obra, tipo_vialidad = '') {
   if (tipo_obra == 'Infraestructura vial') {
-    if(tipo_vialidad == 'Mejoramiento'){
+    if (is.null(tipo_vialidad) || tipo_vialidad == 'Construcción') {
       return(list(obras_sipdus_vialidades_mejora_lineas, obras_sipdus_vialidades_mejora_puntos))
     } else {
       return(list(obras_sipdus_vialidades_nuevas_lineas, obras_sipdus_vialidades_nuevas_puntos))
