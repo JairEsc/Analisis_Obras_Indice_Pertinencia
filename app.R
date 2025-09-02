@@ -30,7 +30,7 @@ rasters_salud=list.files("Inputs/Rasters_Generados_en_R/rasters_app_salud/",full
 rasters_educacion=list.files("Inputs/Rasters_Generados_en_R/rasters_app_educacion/",full.names = T) |> lapply(raster)#Otro tema
 
 extent(raster_accesibilidad)=extent(rasters[[1]])##Para poder sumarlos
-
+rasters[[1]]=-rasters[[1]]
 ###UI
 
 
@@ -192,12 +192,13 @@ generar_lista_descripciones <- function(tipo_obra, tipo_vialidad = '') {
 generar_lista_rasters <- function(tipo_obra, tipo_vialidad = '') {
   if (tipo_obra == 'Infraestructura vial') {
     if (is.null(tipo_vialidad) || tipo_vialidad == 'Construcción') {
+      return(rasters)
+      
+    } else {
       raster_uso <- raster("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif")
       raster_uso <- ((raster_uso + 1) |> log() |> scale()) #|> aggregate(3)
       
       return(list(raster_accesibilidad, -raster_uso)) ##Cambiamos la interpretación de accesibilidad. Debe ser una zona con alta accesibilidad y mucho uso
-    } else {
-      return(rasters)
     }
   } else if (tipo_obra == "Infraestructura Suministro de Agua") {
     return(c(rasters[1:7], rasters_agua[[1]], rasters[[9]], rasters_agua[[2]]))
@@ -274,14 +275,10 @@ server <- function(input, output, session) {
   })
   
   dummy_raster_data <- eventReactive(input$generate_map_button, {
-    num_rasters <- if (input$select_obras == 'Infraestructura vial' && input$select_nuevas_o_reconstrucciones=='Mejoramiento') {
-      2
-    } else {
-      10
-    }
-    
+    num_rasters <- length(rasters_seleccionados())
+    print(paste0("Numero de rasters_ sel", num_rasters))
     current_rasters <- rasters_seleccionados()
-    #current_rasters[[1]] <- -current_rasters[[1]]
+    current_rasters[[1]] <- -current_rasters[[1]]
     
     # if (length(current_rasters) != num_rasters) {
     #   stop("Este es un stop para asegurarme que uní servicios en un solo raster")
@@ -353,7 +350,7 @@ server <- function(input, output, session) {
   
   output$download_excel <- downloadHandler(
     filename = function() {
-      paste0("listado_obras", Sys.Date(), ".xlsx")
+      paste0("listado_obras", Sys.Date(),input$select_obras, ".xlsx")
     },
     content = function(file) {
       req(dummy_raster_data())
