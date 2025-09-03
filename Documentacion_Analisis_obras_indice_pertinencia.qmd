@@ -1,11 +1,15 @@
 ---
 title: "Documentación Análisis de Pertinencia de Obras"
-lightbox: true
 author: "Jair"
 format: 
   html:
+    toc: true
     page-layout: full
+    other-links:
+      - text: App - Índice de Pertinencia (Obras)
+        href: https://jaires-analisis-obras-indice-pertinencia.share.connect.posit.cloud/
 editor: visual
+lightbox: true
 bibliography: references.bib  
 ---
 
@@ -260,8 +264,8 @@ Podemos explorar algunas correlaciones entre los raster utilizados (da click a l
 #| echo: false
 #| message: false
 #| warning: false
-#| out-width: "60vw"
-#| out-height: "80vh"
+#| fig-width: 12
+#| fig-height: 7
 library(ggcorrplot)
 
 rasters_by_cells <- rasters_full |> lapply(getValues)
@@ -269,7 +273,7 @@ rasters_by_cells=rasters_by_cells |> as.data.frame()
 colnames(rasters_by_cells)=gsub("\n","",rasters_list_names_full)
 cormat <- round(cor(rasters_by_cells,use = "na"),2)
 #head(cormat)
-ggcorrplot(cormat,lab = T,type = "lower",show.diag = F,lab_size = 2.8)
+ggcorrplot(cormat,lab = T,type = "lower",show.diag = F,lab_size = 2.2)
 
 ```
 
@@ -287,12 +291,12 @@ library(slickR)
 div(
   style = "display: flex;",
   div(
-    style = "width: 47.5%;",
+    style = "width: 47.5%;height:90%",
     slickR(raster_plots) +
       settings(dots = TRUE)
   ),
   div(
-    style = "width: 47.5%;padding-left:5%",
+    style = "width: 47.5%;padding-left:5%;height:90%",
     slickR(raster_plots[c(2:length(raster_plots))]) +
       settings(dots = TRUE)
   )
@@ -306,7 +310,7 @@ Esta información se toma en cuenta al momento de definir los rankings en el mé
 
 Consideraremos 5 rubros de obras, para los cuales se utilizarán rasters específicos dependiendo del rubro. Por ejemplo, naturalmente usamos *percepción de infraestructura de salud* para el rubro de *Infraestructura de Salud.* Los rubros utilizados son:
 
-## Infraestructura Vial 
+## Infraestructura Vial
 
 Definimos dos tipos de obra, ***Mejoramiento*** y ***Construcción.*** En la primera se agregan aquellas obras que consisten en remodelación, reconstrucción, repavimentación o mejoramiento de obras ya existentes.
 
@@ -316,6 +320,7 @@ Para la definición de la pertinencia de una obra ya existente se considerarán 
 
 ```{r}
 #| echo: false
+#| fig-align: center
 
 ###Agregarlos en un div con display flex.
 
@@ -438,28 +443,10 @@ Además, dada la alta correlación entre distancia a localidades con bajo acceso
 
 Con los rankings de criterios definimos una transformación lineal con los criterios y su interpretación
 
-```{r}
-#| echo: false
+![Diagrama de generación de Índice de Pertinencia](Inputs/Rasters_Generados_en_R/Otros/diagram-20250903.png){fig-align="center" width="606"}
 
-```
+Incluimos una aplicación Web que te permite definir los pesos de los rasters de cada tipo de obra.
 
-```{r}
-#| include: false
-# 
-# Mejoramiento
-# 
-# Pendiente
-div(
-  style = "display: flex;",
-  div(
-    style = "width: 47.5%;",
-    plot(rasters[[1]])
-  ),
-  div(
-    style = "width: 47.5%;padding-left:5%",
-    plot("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif" |> raster())
-  )
-)
-```
+[App- Índice de Pertinencia (Obras)](https://jaires-analisis-obras-indice-pertinencia.share.connect.posit.cloud/)
 
-## Referencias
+# Referencias

@@ -367,7 +367,7 @@ server <- function(input, output, session) {
                                     method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
                                     fun = mean, na.rm = TRUE)
         lineas_df <- lineas_a_usar |>
-          dplyr::select(Municipio:Ejecutora, Geometria_tipo) |>
+          dplyr::select(ID_OBRA,Municipio:Ejecutora, Geometria_tipo) |>
           st_drop_geometry() |>
           dplyr::mutate(indice_pertinencia = z_lineas)
         lista_resultados[[length(lista_resultados) + 1]] <- lineas_df
@@ -375,7 +375,7 @@ server <- function(input, output, session) {
       
       # Procesar puntos si existen
       if (nrow(puntos_a_usar) > 0) {
-        z_puntos <- raster::extract(dummy_raster_data(), puntos_a_usar |> st_transform(st_crs("EPSG:32614")),
+        z_puntos <- raster::extract(ID_OBRA,dummy_raster_data(), puntos_a_usar |> st_transform(st_crs("EPSG:32614")),
                                     method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
                                     fun = mean, na.rm = TRUE)
         puntos_df <- puntos_a_usar |>
