@@ -306,7 +306,7 @@ server <- function(input, output, session) {
       addPolylines(data = lineas_seleccionadas, label = labels_para_usar[[1]], group = 'Obras (líneas)',layerId = 1:nrow(lineas_seleccionadas)) |>
       addMarkers(data = puntos_seleccionadas, label = labels_para_usar[[2]], group = 'Obras (puntos)',layerId = (1+nrow(lineas_seleccionadas)):(nrow(lineas_seleccionadas)+nrow(puntos_seleccionadas))) |>
       addLayersControl(overlayGroups = c("Pertinencia", 'Obras (líneas)', 'Obras (puntos)')) |> 
-      leaflet.extras::addSearchFeatures(targetGroups = c('Obras (líneas)','Obras (puntos)'),options = leaflet.extras::searchFeaturesOptions(hideMarkerOnCollapse=T))
+      leaflet.extras::addSearchFeatures(targetGroups = c('Obras (líneas)','Obras (puntos)'),options = leaflet.extras::searchFeaturesOptions(hideMarkerOnCollapse=T)) 
   })
   
   observeEvent(input$result_map_marker_click,{
@@ -375,11 +375,11 @@ server <- function(input, output, session) {
       
       # Procesar puntos si existen
       if (nrow(puntos_a_usar) > 0) {
-        z_puntos <- raster::extract(ID_OBRA,dummy_raster_data(), puntos_a_usar |> st_transform(st_crs("EPSG:32614")),
+        z_puntos <- raster::extract(dummy_raster_data(), puntos_a_usar |> st_transform(st_crs("EPSG:32614")),
                                     method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
                                     fun = mean, na.rm = TRUE)
         puntos_df <- puntos_a_usar |>
-          dplyr::select(Municipio:Ejecutora, Geometria_tipo) |>
+          dplyr::select(ID_OBRA,Municipio:Ejecutora, Geometria_tipo) |>
           st_drop_geometry() |>
           dplyr::mutate(indice_pertinencia = z_puntos)
         lista_resultados[[length(lista_resultados) + 1]] <- puntos_df
@@ -389,8 +389,13 @@ server <- function(input, output, session) {
       if (length(lista_resultados) > 0) {
         zz <- do.call(rbind, lista_resultados) |>
           dplyr::arrange(dplyr::desc(indice_pertinencia))
-        
-        openxlsx::write.xlsx(zz, file, overwrite = TRUE)
+        zz$indice_pertinencia[zz$indice_pertinencia |> is.nan()]=NA
+        zz_id_obra=zz |> dplyr::group_by(ID_OBRA) |> 
+          dplyr::summarise(indice_pertinencia=mean(indice_pertinencia,na.rm=T))
+        zz_id_obra=zz_id_obra |> merge(zz |> dplyr::select(-indice_pertinencia),by='ID_OBRA',all.x=T)
+        zz_id_obra=zz_id_obra |> dplyr::ungroup() |> dplyr::group_by(ID_OBRA) |> dplyr::slice_head(n=1)|> 
+          dplyr::relocate(indice_pertinencia,.after = dplyr::last_col())
+        openxlsx::write.xlsx(zz_id_obra, file, overwrite = TRUE)
       } else {
         # Si no hay obras para el tipo de obra, crear un archivo vacío o con un mensaje
         warning("No se encontraron obras para el tipo seleccionado.")
