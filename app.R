@@ -336,7 +336,7 @@ server <- function(input, output, session) {
       clearPopups() %>%
       addPopups(dat = input$result_map_shape_click, lat = ~lat, lng = ~lng, update_labels(obra_sel,z))
   })
-  
+
   observeEvent(input$generate_map_button, {
     req(dummy_raster_data())
     min_raster <- raster::minValue(dummy_raster_data())

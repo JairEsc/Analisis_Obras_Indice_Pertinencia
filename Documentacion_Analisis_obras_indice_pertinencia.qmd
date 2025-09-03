@@ -1,5 +1,5 @@
 ---
-title: "Documentación Análisis de Pertinencia de Obras Carreteras"
+title: "Documentación Análisis de Pertinencia de Obras"
 lightbox: true
 author: "Jair"
 format: 
@@ -138,7 +138,7 @@ leaflet() |> addTiles(options = leaflet::tileOptions(opacity = 0.5)) |>
 #   addMarkers(data=obras_sipdus_punto,group = "Obras_tipo_multipunto",
 #              label = obras_sipdus_punto$Obra) 
 
-  addLayersControl(overlayGroups = rasters_list_names_full) |> addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Valores de rasters', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = '',tickLength = 0)
+  addLayersControl(overlayGroups = rasters_list_names_full) |> addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Valores de rasters', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 120,labels = '',tickLength = 0)
 ```
 
 ```{r}
@@ -170,14 +170,45 @@ library(raster)
 library(viridis)
 library(htmlwidgets)
 library(slickR)
-rasters_list_names_interpretaciones=rasters_list_names |> as.list()
+descripciones_list_full=rasters_list_names_full |> as.list()
+descripciones_list_full=paste0(descripciones_list_full,"-------")
+descripciones_minimas=c(
+  "Se mide en distancia. Mayor valor significa más pertinente la obra",
+  "Se mide en distancia. Menor distancia a centros de trabajo significa más pertinente la obra",
+  "Se mide en distancia. Mayor distancia una ANP significa más pertinente la obra",
+  "Se mide en distancia. Menor distancia a escuelas significa más pertinente la obra",
+  "Se mide en distancia. Menor distancia a hospitales significa más pertinente la obra",
+  "Se mide en log-distancia. Menor distancia a localidades marginadas significa más pertinente la obra",
+  "Se mide en log-distancia. Menor valor significa obra específica de una ZAP. I.e. más pertinente la obra",
+  "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin servicios públicos I.e. más pertinente la obra",
+  "Se mide en porcentaje de votos. Mayor valor significa más votos al partido",
+  "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"
+)
+descripciones_minimas=descripciones_minimas[c(1:7,9,10)]
 
-rasters_list_names_full=c(rasters_list_names[c(1:7,9,10)],
-                          "Distancia a localidades con bajo acceso a agua entubada","Percepción suministro de agua",
-                          "Distancia a localidades con bajo acceso a drenaje sanitario","Percepción infraestructura de drenaje",
-                   "Percepción de Espacios Públicos","Percepción Infraestructura Educativa",   "Percepción Infraestructura Salud"    )
-rasters_list_names_interpretaciones[[1]]=paste0(rasters_list_names_interpretaciones[[1]],
-          "-------\n Dado que la distancia se mide en minutos, mayor valor de accesibilidad indica lugares de difícil acceso, en tal caso, un valor alto de accesibilidad indica más pertinencia de obras carreteras.")
+descripciones_list_full[[1]]=paste0(descripciones_list_full[[1]],descripciones_minimas[1])
+descripciones_list_full[[2]]=paste0(descripciones_list_full[[2]],descripciones_minimas[2])
+descripciones_list_full[[3]]=paste0(descripciones_list_full[[3]],descripciones_minimas[3])
+descripciones_list_full[[4]]=paste0(descripciones_list_full[[4]],descripciones_minimas[4])
+descripciones_list_full[[5]]=paste0(descripciones_list_full[[5]],descripciones_minimas[5])
+descripciones_list_full[[6]]=paste0(descripciones_list_full[[6]],descripciones_minimas[6])
+descripciones_list_full[[7]]=paste0(descripciones_list_full[[7]],descripciones_minimas[7])
+descripciones_list_full[[8]]=paste0(descripciones_list_full[[8]],descripciones_minimas[8])
+descripciones_list_full[[9]]=paste0(descripciones_list_full[[9]],descripciones_minimas[9])
+#agua
+descripciones_list_full[[10]]=paste0(descripciones_list_full[[10]],"Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra")
+descripciones_list_full[[11]]=paste0(descripciones_list_full[[11]],"Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra")
+#drenaje
+descripciones_list_full[[12]]=paste0(descripciones_list_full[[12]],"Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a drenaje sanitario. I.e. más pertinente la obra")
+descripciones_list_full[[13]]=paste0(descripciones_list_full[[13]],"Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra")
+#espacios publicos
+descripciones_list_full[[14]]=paste0(descripciones_list_full[[14]],"Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra")
+
+#Educacion
+descripciones_list_full[[15]]=paste0(descripciones_list_full[[15]],"Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra")
+
+#Salud
+descripciones_list_full[[16]]=paste0(descripciones_list_full[[16]],"Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra")
 
 
 ```
@@ -196,12 +227,12 @@ library(slickR)
 library(grid)
 library(ggplot2)
 raster_plots <- list()
-for (i in 1:length(rasters)){
+for (i in 1:length(rasters_full)){
   temp_file <- tempfile(fileext = ".png")
   png(temp_file)
-  plot(rasters[[i]], col = viridis(256), legend = TRUE, main = rasters_list_names[i])
+  plot(rasters_full[[i]], col = viridis(256), legend = TRUE, main = rasters_list_names_full[i])
   
-  hist_plot <- ggplot(data.frame(x = getValues(rasters[[i]])), aes(x)) +
+  hist_plot <- ggplot(data.frame(x = getValues(rasters_full[[i]])), aes(x)) +
     geom_histogram(bins = 30, fill = viridis(1), color = "white") +
     theme_minimal() +
     labs(x = "", y = "") +
@@ -217,7 +248,7 @@ for (i in 1:length(rasters)){
 }
 
 slickR(raster_plots,height = "80vh",width = "90%")%synch%
-( slickR(rasters_list_names_interpretaciones, slideType = 'p'))+
+( slickR(descripciones_list_full, slideType = 'p'))+
   settings(
     dots = TRUE,adaptiveHeight = T
   )
@@ -229,16 +260,16 @@ Podemos explorar algunas correlaciones entre los raster utilizados (da click a l
 #| echo: false
 #| message: false
 #| warning: false
-#| out-width: "80vw"
+#| out-width: "60vw"
 #| out-height: "80vh"
 library(ggcorrplot)
 
-rasters_by_cells <- rasters |> lapply(getValues)
+rasters_by_cells <- rasters_full |> lapply(getValues)
 rasters_by_cells=rasters_by_cells |> as.data.frame()
-colnames(rasters_by_cells)=gsub("\n","",rasters_list_names)
+colnames(rasters_by_cells)=gsub("\n","",rasters_list_names_full)
 cormat <- round(cor(rasters_by_cells,use = "na"),2)
 #head(cormat)
-ggcorrplot(cormat,lab = T,type = "lower",show.diag = F,lab_size = 0.8)
+ggcorrplot(cormat,lab = T,type = "lower",show.diag = F,lab_size = 2.8)
 
 ```
 
@@ -262,7 +293,7 @@ div(
   ),
   div(
     style = "width: 47.5%;padding-left:5%",
-    slickR(raster_plots[c(2:10)]) +
+    slickR(raster_plots[c(2:length(raster_plots))]) +
       settings(dots = TRUE)
   )
 )
@@ -273,9 +304,13 @@ Esta información se toma en cuenta al momento de definir los rankings en el mé
 
 # Criterios de Clasificación
 
+Consideraremos 5 rubros de obras, para los cuales se utilizarán rasters específicos dependiendo del rubro. Por ejemplo, naturalmente usamos *percepción de infraestructura de salud* para el rubro de *Infraestructura de Salud.* Los rubros utilizados son:
+
+## Infraestructura Vial 
+
 Definimos dos tipos de obra, ***Mejoramiento*** y ***Construcción.*** En la primera se agregan aquellas obras que consisten en remodelación, reconstrucción, repavimentación o mejoramiento de obras ya existentes.
 
-## ***Mejoramiento***
+### ***Mejoramiento***
 
 Para la definición de la pertinencia de una obra ya existente se considerarán únicamente los criterios de Accesibilidad y una medida de uso definida a partir de datos de orígenes destino, los cuales están definidos únicamente para vialidades.
 
@@ -286,9 +321,9 @@ Para la definición de la pertinencia de una obra ya existente se considerarán 
 
 par(mfrow=c(1,2))
 
-plot(rasters[[1]],
+plot(rasters_full[[1]],
 col = viridis(256),
-legend = TRUE,main=rasters_list_names[1])
+legend = TRUE,main=rasters_list_names_full[1])
  
 plot("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif" |> raster(),
 col = viridis(256),
@@ -297,7 +332,7 @@ legend = TRUE,main="Nivel de uso")
 par(mfrow=c(1,1))
 ```
 
-## Construcción
+### Construcción
 
 Para definir la pertinencia de una obra nueva, se utilizarán los criterios anteriormente enunciados, a partir del siguiente ranking.
 
@@ -355,93 +390,57 @@ Para definir la pertinencia de una obra nueva, se utilizarán los criterios ante
 
     </div>
 
-# Clasificación
+-   <div>
 
-## Contrucción
+    10. Percepción Infraestructura Vial
+
+    </div>
+
+## Infraestructura de Suministro de Agua
+
+Se utilizarán rasters específicos del rubro:
+
+-   Distancia a localidades con bajo acceso a agua entubada
+
+-   Percepción suministro de agua
+
+## Infraestructura de Drenaje
+
+Se utilizarán rasters específicos del rubro:
+
+-   Distancia a localidades con bajo acceso a drenaje sanitario
+
+-   Percepción infraestructura de drenaje
+
+## Infraestructura de Salud
+
+Se utilizará raster específicos del rubro:
+
+-   Percepción Infraestructura de Salud
+
+## Infraestructura Educativa
+
+Se utilizará raster específicos del rubro:
+
+-   Percepción Infraestructura Educativa
+
+## Espacios Públicos
+
+Se utilizará raster específicos del rubro:
+
+-   Percepción Espacios Públicos
+
+# Clasificación
 
 Antes de definir el índice de pertinencia removemos valores atípicos para cada raster basados en el criterio del rango intercuartil. Estos valores atípicos se reemplazan con los valores máximos o mínimos de los valores no atípicos, según sea el caso.
 
 Además, dada la alta correlación entre distancia a localidades con bajo acceso a agua entubada y drenaje, se combinan en un solo raster dado por el mínimo entre ellos.
 
-```{r}
-#| echo: false
-
-library(raster)
-library(viridis)
-library(htmltools)
-library(slickR)
-rasters[[8]]=min(rasters[[8]],rasters[[9]],na.rm = T)
-rasters=rasters[c(1:8,10)]
-rasters_list_names[8]='Distancia a localidades con bajo acceso a agua entubada o drenaje sanitario'
-rasters_list_names=rasters_list_names[c(1:8,10)]
-for(i in 1:length(rasters)){
-  raster_vals <- values(rasters[[i]])
-  raster_vals <- raster_vals[!is.na(raster_vals)]
-  
-  q1 <- quantile(raster_vals, 0.25)
-  q3 <- quantile(raster_vals, 0.75)
-  iqr <- q3 - q1
-  
-  upper_limit <- q3 + 1.5 * iqr
-  lower_limit <- q1 - 1.5 * iqr
-  
-  rasters[[i]] <- clamp(rasters[[i]], 
-                        lower = lower_limit, 
-                        upper = upper_limit, 
-                        useValues=TRUE)
-}
-
-
-raster_plots <- list()
-  for (i in 1:length(rasters)){
-    # Crear un archivo PNG temporal para cada gráfico
-    temp_file <- tempfile(fileext = ".png")
-    png(temp_file, width = 600, height = 400)
-    plot(rasters[[i]],
-         col = viridis(256),
-         legend = TRUE,main=rasters_list_names[i])
-    dev.off()
-    raster_plots[[i]] <- temp_file
-  }
-
-###Agregarlos en un div con display flex.
-div(
-  style = "display: flex;",
-  div(
-    style = "width: 47.5%;",
-    slickR(raster_plots) +
-      settings(dots = TRUE)
-  ),
-  div(
-    style = "width: 47.5%;padding-left:5%",
-    slickR(raster_plots[c(2:9)]) +
-      settings(dots = TRUE)
-  )
-)
-
-```
-
 Con los rankings de criterios definimos una transformación lineal con los criterios y su interpretación
 
 ```{r}
 #| echo: false
-current_rasters=rasters
-current_rasters_list_names=rasters_list_names
-origin(current_rasters[[1]])=origin(current_rasters[[2]])
-extent(current_rasters[[1]])=extent(current_rasters[[2]])
-weights=c(9,3,2,4,5,8,7,6,1)
-weights=weights/sum(weights)
-weights[1]=-weights[1]
-weights=-weights
 
-current_rasters= current_rasters|> sapply(scale,simplify = T,USE.NAMES = F)
-(current_rasters[[1]]*weights[1]+current_rasters[[2]]*weights[2]+
-  current_rasters[[3]]*weights[3]+current_rasters[[4]]*weights[4]+
-  current_rasters[[5]]*weights[5]+current_rasters[[6]]*weights[6]+
-  current_rasters[[7]]*weights[7]+current_rasters[[8]]*weights[8]+
-  current_rasters[[9]]*weights[9])->z_sum
-
-leaflet() |> addTiles() |> addRasterImage(z_sum)|> addLegendNumeric( pal = colorNumeric('Spectral', 1:100) , values = 1:100, position = 'bottomright', title = 'Valores de rasters', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = '',tickLength = 0) 
 ```
 
 ```{r}

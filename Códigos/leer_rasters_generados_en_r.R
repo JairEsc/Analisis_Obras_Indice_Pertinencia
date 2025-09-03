@@ -20,7 +20,7 @@ descripciones_minimas=c(
   "Se mide en distancia. Mayor distancia una ANP significa más pertinente la obra",
   "Se mide en distancia. Menor distancia a escuelas significa más pertinente la obra",
   "Se mide en distancia. Menor distancia a hospitales significa más pertinente la obra",
-  "Se mide en log-distancia. Menor distancia a hospitales localidades marginadas significa más pertinente la obra",
+  "Se mide en log-distancia. Menor distancia a localidades marginadas significa más pertinente la obra",
   "Se mide en log-distancia. Menor valor significa obra específica de una ZAP. I.e. más pertinente la obra",
   "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin servicios públicos I.e. más pertinente la obra",
   "Se mide en porcentaje de votos. Mayor valor significa más votos al partido",
