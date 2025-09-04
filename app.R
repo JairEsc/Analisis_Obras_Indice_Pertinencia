@@ -13,8 +13,8 @@ source("Códigos/leer_geojsons_c_extract.R") #Regresa funciones generate_labels,
                                             #También regresa obras tipo linea y punto de cada tipo de obra
 source("Códigos/leer_rasters_generados_en_r.R") ##Regresa rasters_list_names (default obras viales nuevas)
 #rsconnect::writeManifest()
+#shiny2docker::shiny2docker(".")
 ####Requerimientos previos. 
-
 raster_accesibilidad="Inputs/Rasters_Generados_en_R/Accesibilidad_cabeceras_negative_scaled.tif" |> raster()
 
 ##Definir pesos por default
