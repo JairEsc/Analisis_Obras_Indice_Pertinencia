@@ -35,27 +35,30 @@ rasters[[1]]=-rasters[[1]]
 
 
 
+
+
 ui <- fluidPage(
   tags$head(
     tags$script(src = "https://cdn.tailwindcss.com"),
-    tags$style(HTML({"
+    tags$style(HTML({
+      "
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #f3f4f6; 
+        background-color: #f3f4f6;
       }
       .panel {
         background-color: #ffffff;
-        border-radius: 0.75rem; 
+        border-radius: 0.75rem;
         padding: 1.5rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       }
       .title-text {
-        color: #1f2937; 
+        color: #1f2937;
         font-weight: 700;
       }
       .subtitle-text {
-        color: #4b5563; 
+        color: #4b5563;
       }
       .input-label {
         font-weight: 500;
@@ -64,7 +67,7 @@ ui <- fluidPage(
         display: block;
       }
       .btn-primary {
-        background-color: #4f46e5; 
+        background-color: #4f46e5;
         color: white;
         padding: 0.75rem 1.5rem;
         border-radius: 0.5rem;
@@ -86,7 +89,8 @@ ui <- fluidPage(
       .leaflet-map-container-custom{
         height: 90vh;
       }
-    "}))
+      "
+    }))
   ),
   # Contenedor principal para toda la página, centrado y con ancho limitado
   div(class = "container mx-auto p-4 md:p-8 max-w-12xl",
@@ -95,23 +99,24 @@ ui <- fluidPage(
           # Panel lateral para los controles (pesos de los rasters)
           div(class = "lg:col-span-1 panel sliders-responsive",
               div(class='flex',
-              h1(class = "text-2xl font-semibold mb-6 text-gray-800", "Análisis de obras:"),
-              selectInput(inputId = "select_obras",label="",choices = c("Infraestructura vial",
-                                                                        "Infraestructura Suministro de Agua",
-                                                                        "Infraestructura Drenaje",
-                                                                        "Infraestructura Salud", 
-                                                                        "Infraestructura Educación",
-                                                                        "Espacios Públicos"
-                                                                        )) 
-              ),uiOutput("second_input_infra_vial"),
+                  h1(class = "text-2xl font-semibold mb-6 text-gray-800", "Análisis de obras:"),
+                  selectInput(inputId = "select_obras", label = "", choices = c("Infraestructura vial",
+                                                                                "Infraestructura Suministro de Agua",
+                                                                                "Infraestructura Drenaje",
+                                                                                "Infraestructura Salud",
+                                                                                "Infraestructura Educación",
+                                                                                "Espacios Públicos"
+                  ))
+              ),
+              uiOutput("second_input_infra_vial"),
               h2(class = "text-2xl font-semibold mb-6 text-gray-800", "Ajustar Pesos de Rasters"),
               
-              p(class = "text-sm text-gray-600 mb-6", 
+              p(class = "text-sm text-gray-600 mb-6",
                 "Define la influencia de cada uno de los rasters (estandarizados)"),
               
               # Sliders para los n rasters
               uiOutput("dynamic_sliders"),
-
+              
               # Botón para generar el mapa
               div(class = "mt-8 text-center",
                   actionButton(
@@ -124,7 +129,14 @@ ui <- fluidPage(
                     label = "Descargar listado de obras",
                     class = "btn-primary hover:scale-105 transform transition-all duration-200"
                   )
+              ),
+              # "See more details" hyperlink at the bottom of the sidebar
+              div(class = "mt-12 text-center text-sm text-blue-600 hover:underline",
+                  tags$a(href = "https://jairesc.github.io/Analisis_Obras_Indice_Pertinencia/Documentacion_Analisis_obras_indice_pertinencia.html",
+                         "Ver más detalles",
+                         target="_blank")
               )
+              
           ),
           
           # Panel principal para el mapa Leaflet
@@ -305,7 +317,7 @@ server <- function(input, output, session) {
       addTiles(options = tileOptions(opacity = 0.8)) |>
       addPolylines(data = lineas_seleccionadas, label = labels_para_usar[[1]], group = 'Obras (líneas)',layerId = 1:nrow(lineas_seleccionadas)) |>
       addMarkers(data = puntos_seleccionadas, label = labels_para_usar[[2]], group = 'Obras (puntos)',layerId = (1+nrow(lineas_seleccionadas)):(nrow(lineas_seleccionadas)+nrow(puntos_seleccionadas))) |>
-      addLayersControl(overlayGroups = c("Pertinencia", 'Obras (líneas)', 'Obras (puntos)')) |> 
+      addLayersControl(overlayGroups = c("Pertinencia", 'Obras (líneas)', 'Obras (puntos)'),options = layersControlOptions(collapsed = F)) |> 
       leaflet.extras::addSearchFeatures(targetGroups = c('Obras (líneas)','Obras (puntos)'),options = leaflet.extras::searchFeaturesOptions(hideMarkerOnCollapse=T)) 
   })
   
@@ -344,7 +356,7 @@ server <- function(input, output, session) {
     leafletProxy("result_map") |>
       clearImages() |>
       clearControls() |>
-      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.8, group = "Pertinencia") |>
+      addRasterImage(dummy_raster_data(), colors = "Spectral", opacity = 0.7, group = "Pertinencia") |>
       addLegendNumeric( pal = colorNumeric('Spectral', seq(min_raster,max_raster,0.01)) , values = seq(min_raster,max_raster,0.01), position = 'bottomright', title = 'Pertinencia', orientation = 'horizontal', shape = 'rect', decreasing = FALSE, height = 20, width = 100,labels = c(round(min_raster,2) |> paste0(), round(max_raster,2) |> paste0()),tickLength = 0)
   })
   
@@ -376,7 +388,7 @@ server <- function(input, output, session) {
       # Procesar puntos si existen
       if (nrow(puntos_a_usar) > 0) {
         z_puntos <- raster::extract(dummy_raster_data(), puntos_a_usar |> st_transform(st_crs("EPSG:32614")),
-                                    method = 'simple', buffer = NULL, small = FALSE, cellnumbers = FALSE,
+                                    method = 'simple',paralel=T, buffer = NULL, small = FALSE, cellnumbers = FALSE,
                                     fun = mean, na.rm = TRUE)
         puntos_df <- puntos_a_usar |>
           dplyr::select(ID_OBRA,Municipio:Ejecutora, Geometria_tipo) |>
@@ -395,7 +407,7 @@ server <- function(input, output, session) {
         zz_id_obra=zz_id_obra |> merge(zz |> dplyr::select(-indice_pertinencia),by='ID_OBRA',all.x=T)
         zz_id_obra=zz_id_obra |> dplyr::ungroup() |> dplyr::group_by(ID_OBRA) |> dplyr::slice_head(n=1)|> 
           dplyr::relocate(indice_pertinencia,.after = dplyr::last_col())
-        openxlsx::write.xlsx(zz_id_obra, file, overwrite = TRUE)
+        openxlsx::write.xlsx(zz_id_obra |> dplyr::arrange(dplyr::desc(indice_pertinencia)), file, overwrite = TRUE)
       } else {
         # Si no hay obras para el tipo de obra, crear un archivo vacío o con un mensaje
         warning("No se encontraron obras para el tipo seleccionado.")
