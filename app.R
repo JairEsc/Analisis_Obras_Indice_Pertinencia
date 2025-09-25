@@ -19,9 +19,15 @@ raster_accesibilidad="Inputs/Rasters_Generados_en_R/Accesibilidad_cabeceras_nega
 
 ##Definir pesos por default
 
-weights= c(0.15,0.13,0,
+weights= 2*c(0.15,0.09,0.05,
            #0,#Eliminamos ANP
-           0.13,0.17,0.15,0,0.19,0.17)
+           0.06,0.14,0.15,0,0.19,0.17)
+limite_inferior= c(0.2,0.05,0.05,
+           #0,#Eliminamos ANP
+           0.05,0.2,0.2,0,0,0.3)
+limite_superior= c(0.3,0.2,0.2,
+           #0,#Eliminamos ANP
+           0.2,0.3,0.3,1,1,0.4)
   #c(9,6,0,0,6,8,7,0,0,11)#c(2*c(9,3,0,0,5,8,7,0,1),0,0,0,0,0)
 rasters_list_names
 rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)##Definimos rasters del caso base
@@ -263,6 +269,23 @@ server <- function(input, output, session) {
     
     num_rasters <- length(titulos)
     print(num_rasters)
+    if(num_rasters==2){
+      lapply(1:num_rasters, function(i) {
+        div(
+          class = "mb-4",
+          p(class = "input-label", titulos[[i]]),
+          sliderInput(
+            inputId = paste0("raster_weight_", i),
+            label = descripciones[i],
+            min = limite_inferior[c(1,9)][[i]],
+            max = limite_superior[c(1,9)][[i]],
+            value = weights[c(1,9)][i],
+            step = 0.01,
+            width = "100%"
+          )
+        )
+      })
+    }else{
     lapply(1:num_rasters, function(i) {
       div(
         class = "mb-4",
@@ -270,14 +293,15 @@ server <- function(input, output, session) {
         sliderInput(
           inputId = paste0("raster_weight_", i),
           label = descripciones[i],
-          min = 0,
-          max = 1,
+          min = limite_inferior[[i]],
+          max = limite_superior[[i]],
           value = weights[i],
           step = 0.01,
           width = "100%"
         )
       )
     })
+      }
   })
   
   rasters_seleccionados <- reactive({
@@ -305,6 +329,10 @@ server <- function(input, output, session) {
     }
     print(weights)
     print("Haciendo la suma")
+    if(sum(weights)>0){
+      weights=weights/sum(weights)
+      print(weights)
+      }
     combined_raster <- Reduce(`+`, Map(`*`, current_rasters , -weights))
     combined_raster[abs(combined_raster)<1e-4]=NA
     return(combined_raster)
