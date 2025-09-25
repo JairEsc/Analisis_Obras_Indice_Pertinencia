@@ -19,7 +19,9 @@ raster_accesibilidad="Inputs/Rasters_Generados_en_R/Accesibilidad_cabeceras_nega
 
 ##Definir pesos por default
 
-weights= c(0.15,0.13,0,0,0.13,0.17,0.15,0,0.19,0.17)
+weights= c(0.15,0.13,0,
+           #0,#Eliminamos ANP
+           0.13,0.17,0.15,0,0.19,0.17)
   #c(9,6,0,0,6,8,7,0,0,11)#c(2*c(9,3,0,0,5,8,7,0,1),0,0,0,0,0)
 rasters_list_names
 rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)##Definimos rasters del caso base
@@ -169,15 +171,15 @@ generar_lista_titulos <- function(tipo_obra, tipo_vialidad = '') {
       return(c(rasters_list_names[1], "Nivel de uso"))
     }
   } else if (tipo_obra == "Infraestructura Suministro de Agua") {
-    return(c(rasters_list_names[1:7], "Distancia a localidades con bajo acceso a agua entubada", rasters_list_names[9], "Percepción suministro de agua"))
+    return(c(rasters_list_names[1:6], "Distancia a localidades con bajo acceso a agua entubada", rasters_list_names[8], "Percepción suministro de agua"))
   } else if (tipo_obra == "Infraestructura Drenaje") {
-    return(c(rasters_list_names[1:7], "Distancia a localidades con bajo acceso a drenaje sanitario", rasters_list_names[9], "Percepción infraestructura de drenaje"))
+    return(c(rasters_list_names[1:6], "Distancia a localidades con bajo acceso a drenaje sanitario", rasters_list_names[8], "Percepción infraestructura de drenaje"))
   } else if (tipo_obra == "Espacios Públicos") {
-    return(c(rasters_list_names[1:9],"Percepción de Espacios Públicos"))
+    return(c(rasters_list_names[1:8],"Percepción de Espacios Públicos"))
   } else if (tipo_obra == "Infraestructura Educación") {
-    return(c(rasters_list_names[1:9],"Percepción Infraestructura Educativa"))
+    return(c(rasters_list_names[1:8],"Percepción Infraestructura Educativa"))
   } else if (tipo_obra=='Infraestructura Salud'){
-    return(c(rasters_list_names[1:9],"Percepción Infraestructura Salud"))
+    return(c(rasters_list_names[1:8],"Percepción Infraestructura Salud"))
   }
 }
 
@@ -189,15 +191,15 @@ generar_lista_descripciones <- function(tipo_obra, tipo_vialidad = '') {
       return(c(descripciones_minimas[1], "Se mide en número de viajes. Mayor valor significa más pertinente la obra"))
     }
   } else if (tipo_obra == "Infraestructura Suministro de Agua") {
-    return(c(descripciones_minimas[1:7], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra", descripciones_minimas[9], "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
+    return(c(descripciones_minimas[1:6], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra", descripciones_minimas[8], "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
   } else if (tipo_obra == "Infraestructura Drenaje") {
-    return(c(descripciones_minimas[1:7], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a drenaje sanitario. I.e. más pertinente la obra", descripciones_minimas[9], "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
+    return(c(descripciones_minimas[1:6], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a drenaje sanitario. I.e. más pertinente la obra", descripciones_minimas[8], "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
   } else if (tipo_obra == "Espacios Públicos") {
-    return(c(descripciones_minimas[1:9],descripciones_Espacios_Publicos[1]))
+    return(c(descripciones_minimas[1:8],descripciones_Espacios_Publicos[1]))
   } else if (tipo_obra == "Infraestructura Educación") {
-    return(c(descripciones_minimas[1:9],descripciones_educacion[1]))
+    return(c(descripciones_minimas[1:8],descripciones_educacion[1]))
   } else if (tipo_obra=='Infraestructura Salud'){
-    return(c(descripciones_minimas[1:9],descripciones_salud[1]))
+    return(c(descripciones_minimas[1:8],descripciones_salud[1]))
   }
 }
 
@@ -213,15 +215,15 @@ generar_lista_rasters <- function(tipo_obra, tipo_vialidad = '') {
       return(list(raster_accesibilidad, -raster_uso)) ##Cambiamos la interpretación de accesibilidad. Debe ser una zona con alta accesibilidad y mucho uso
     }
   } else if (tipo_obra == "Infraestructura Suministro de Agua") {
-    return(c(rasters[1:7], rasters_agua[[1]], rasters[[9]], rasters_agua[[2]]))
+    return(c(rasters[1:6], rasters_agua[[1]], rasters[[8]], rasters_agua[[2]]))
   } else if (tipo_obra == "Infraestructura Drenaje") {
-    return(c(rasters[1:7], rasters_drenaje[[1]], rasters[[9]], rasters_drenaje[[2]]))
+    return(c(rasters[1:6], rasters_drenaje[[1]], rasters[[8]], rasters_drenaje[[2]]))
   } else if (tipo_obra == "Espacios Públicos") {
-    return(c(rasters[1:9],rasters_Espacios_publicos[[1]]))
+    return(c(rasters[1:8],rasters_Espacios_publicos[[1]]))
   } else if (tipo_obra == "Infraestructura Educación") {
-    return(c(rasters[1:9],rasters_educacion[[1]]))
+    return(c(rasters[1:8],rasters_educacion[[1]]))
   } else if (tipo_obra=='Infraestructura Salud'){
-    return(c(rasters[1:9],rasters_salud[[1]]))
+    return(c(rasters[1:8],rasters_salud[[1]]))
   }
 }
 
