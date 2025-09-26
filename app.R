@@ -19,15 +19,15 @@ raster_accesibilidad="Inputs/Rasters_Generados_en_R/Accesibilidad_cabeceras_nega
 
 ##Definir pesos por default
 
-weights= 2*c(0.15,0.09,0.05,
+weights= 2*c(0.15,0.04,0.025,
            #0,#Eliminamos ANP
-           0.06,0.14,0.15,0,0.19,0.17)
-limite_inferior= c(0.2,0.05,0.05,
+           0.025,0.025,0.1,0,0.07,0.2)
+limite_inferior= c(0.2,0,0,
            #0,#Eliminamos ANP
-           0.05,0.2,0.2,0,0,0.3)
-limite_superior= c(0.3,0.2,0.2,
+           0,0,0,0,0,0.3)
+limite_superior= c(0.3,0.15,0.15,
            #0,#Eliminamos ANP
-           0.2,0.3,0.3,1,1,0.4)
+           0.15,0.35,0.35,.15,.15,0.4)
   #c(9,6,0,0,6,8,7,0,0,11)#c(2*c(9,3,0,0,5,8,7,0,1),0,0,0,0,0)
 rasters_list_names
 rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)##Definimos rasters del caso base
