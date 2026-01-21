@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+
+  dashboard:
+    build: 
+      context: ./
+    container_name: Analisis_Pertinencia_Obras_dashboard
+    hostname: Analisis_Pertinencia_Obras_dashboard
+    restart: always
+    ports:
+      - 8055:8055
+    networks:
+      - network 
+    
+
+      
+networks:
+  network:
+    driver: bridge

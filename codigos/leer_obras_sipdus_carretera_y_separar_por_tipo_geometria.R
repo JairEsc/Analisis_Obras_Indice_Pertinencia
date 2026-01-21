@@ -1,6 +1,6 @@
 library(leaflet)
 library(sf)
-"../../Repositorios/Municipal_Inversion_3_años/Datos/SPIDUS_INHIFE_TRY.geojson" |> st_read() |> 
+"../../Repositorios/Municipal_Inversion_3_años/Datos/SPIDUS_INHIFE.geojson" |> st_read() |> 
   st_transform(st_crs("EPSG:4326"))->obras_sipdus
 obras_sipdus_multilinea=obras_sipdus |> dplyr::filter(st_geometry_type(geometry)%in%c('MULTILINESTRING')) |>
   st_cast("LINESTRING")

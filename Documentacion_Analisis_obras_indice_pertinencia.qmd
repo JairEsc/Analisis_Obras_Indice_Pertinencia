@@ -33,8 +33,6 @@ bibliography: references.bib
 
 -   Zonas Prioritarias (Distancia) (@brichetti2021infrastructure)
 
--   Secciones Electorales (Prioritarias)
-
 -   Nivel de uso
 
 -   Distancia a localidades Marginadas (Alta y Muy alta) (@brocker2010assessing)
@@ -58,15 +56,15 @@ library(raster)
 library(viridis)
 library(htmlwidgets)
 library(slickR)
-source("Códigos/leer_rasters_generados_en_r.R")
+source("codigos/leer_rasters_generados_en_r.R")
 rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)##Definimos rasters del caso base
 rasters_agua=list.files("Inputs/Rasters_Generados_en_R/rasters_app_agua/",full.names = T) |> lapply(raster)#Otro tema
 rasters_drenaje=list.files("Inputs/Rasters_Generados_en_R/rasters_app_drenaje/",full.names = T) |> lapply(raster)#Otro tema
 rasters_Espacios_publicos=list.files("Inputs/Rasters_Generados_en_R/rasters_app_espacios_publicos/",full.names = T) |> lapply(raster)#Otro tema
 rasters_salud=list.files("Inputs/Rasters_Generados_en_R/rasters_app_salud/",full.names = T) |> lapply(raster)#Otro tema
 rasters_educacion=list.files("Inputs/Rasters_Generados_en_R/rasters_app_educacion/",full.names = T) |> lapply(raster)#Otro tema
-rasters_full=c(rasters[c(1:7,9,10)],rasters_agua[1:2],rasters_drenaje[1:2],rasters_Espacios_publicos[[1]],rasters_salud[[1]],rasters_educacion[[1]])
-rasters_list_names_full=c(rasters_list_names[c(1:7,9,10)],
+rasters_full=c(rasters[c(1:8)],rasters_agua[1:2],rasters_drenaje[1:2],rasters_Espacios_publicos[[1]],rasters_salud[[1]],rasters_educacion[[1]])
+rasters_list_names_full=c(rasters_list_names[c(1:7,10)],
                           "Distancia a localidades con bajo acceso a agua entubada","Percepción suministro de agua",
                           "Distancia a localidades con bajo acceso a drenaje sanitario","Percepción infraestructura de drenaje",
                    "Percepción de Espacios Públicos","Percepción Infraestructura Educativa",   "Percepción Infraestructura Salud"    )
@@ -97,7 +95,7 @@ Agregamos un widget para la exploración de algunos de los rasters utilizados y 
 #| warning: false
 #| message: false
 library(sf)
-source("Códigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R")
+source("codigos/leer_obras_sipdus_carretera_y_separar_por_tipo_geometria.R")
 ```
 
 ```{r}
@@ -392,13 +390,7 @@ Para definir la pertinencia de una obra nueva, se utilizarán los criterios ante
 
 -   <div>
 
-    9.  Secciones Electorales (Prioritarias)
-
-    </div>
-
--   <div>
-
-    10. Percepción Infraestructura Vial
+    9.  Percepción Infraestructura Vial
 
     </div>
 

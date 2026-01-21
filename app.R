@@ -8,10 +8,10 @@ library(sf)
 library(sp)
 library(leaflegend)
 library(data.table)
-source("Códigos/raster_base.R")##Regresa municipios y base
-source("Códigos/leer_geojsons_c_extract.R") #Regresa funciones generate_labels, update_labels
+#source("codigos/raster_base.R")##Regresa municipios y base
+source("codigos/leer_geojsons_c_extract.R") #Regresa funciones generate_labels, update_labels
                                             #También regresa obras tipo linea y punto de cada tipo de obra
-source("Códigos/leer_rasters_generados_en_r.R") ##Regresa rasters_list_names (default obras viales nuevas)
+source("codigos/leer_rasters_generados_en_r.R") ##Regresa rasters_list_names (default obras viales nuevas)
 #rsconnect::writeManifest()
 #shiny2docker::shiny2docker(".")
 ####Requerimientos previos. 
@@ -21,13 +21,16 @@ raster_accesibilidad="Inputs/Rasters_Generados_en_R/Accesibilidad_cabeceras_nega
 
 weights= 2*c(0.15,0.04,0.025,
            #0,#Eliminamos ANP
-           0.025,0.025,0.1,0,0.07,0.2)
+           0.025,0.025,0.1,0,#0.07,
+           0.2)
 limite_inferior= c(0.2,0,0,
            #0,#Eliminamos ANP
-           0,0,0,0,0,0.3)
+           0,0,0,0,#0,
+           0.3)
 limite_superior= c(0.3,0.15,0.15,
            #0,#Eliminamos ANP
-           0.15,0.35,0.35,.15,.15,0.4)
+           0.15,0.35,0.35,.15,#.15,
+           0.4)
   #c(9,6,0,0,6,8,7,0,0,11)#c(2*c(9,3,0,0,5,8,7,0,1),0,0,0,0,0)
 rasters_list_names
 rasters=list.files("Inputs/Rasters_Generados_en_R/rasters_app/",full.names = T) |> lapply(raster)##Definimos rasters del caso base
@@ -38,14 +41,14 @@ rasters_salud=list.files("Inputs/Rasters_Generados_en_R/rasters_app_salud/",full
 rasters_educacion=list.files("Inputs/Rasters_Generados_en_R/rasters_app_educacion/",full.names = T) |> lapply(raster)#Otro tema
 
 extent(raster_accesibilidad)=extent(rasters[[1]])##Para poder sumarlos
-rasters[[1]]=-rasters[[1]]
+rasters[[1]]=-rasters[[1]]##Esto está bien turbio. Tache para el Jair del pasado. plot(rasters[[1]]) Pero parece que está bien
 ###UI
 
 
 
 
 
-ui <- fluidPage(
+ui <- fluidPage(shinyjs::useShinyjs(),
   tags$head(
     tags$script(src = "https://cdn.tailwindcss.com"),
     tags$style(HTML({
@@ -136,7 +139,8 @@ ui <- fluidPage(
                     outputId = "download_excel",
                     label = "Descargar listado de obras",
                     class = "btn-primary hover:scale-105 transform transition-all duration-200"
-                  )
+                  ),
+                  downloadButton(outputId = "downloadTiff", label = HTML("Descargar <br> TIFF"), class = "btn-primary hover:scale-105 transform transition-all duration-200")
               ),
               # "See more details" hyperlink at the bottom of the sidebar
               div(class = "mt-12 text-center text-sm text-blue-600 hover:underline",
@@ -177,15 +181,15 @@ generar_lista_titulos <- function(tipo_obra, tipo_vialidad = '') {
       return(c(rasters_list_names[1], "Nivel de uso"))
     }
   } else if (tipo_obra == "Infraestructura Suministro de Agua") {
-    return(c(rasters_list_names[1:6], "Distancia a localidades con bajo acceso a agua entubada", rasters_list_names[8], "Percepción suministro de agua"))
+    return(c(rasters_list_names[1:6], "Distancia a localidades con bajo acceso a agua entubada", "Percepción suministro de agua"))
   } else if (tipo_obra == "Infraestructura Drenaje") {
-    return(c(rasters_list_names[1:6], "Distancia a localidades con bajo acceso a drenaje sanitario", rasters_list_names[8], "Percepción infraestructura de drenaje"))
+    return(c(rasters_list_names[1:6], "Distancia a localidades con bajo acceso a drenaje sanitario", "Percepción infraestructura de drenaje"))
   } else if (tipo_obra == "Espacios Públicos") {
-    return(c(rasters_list_names[1:8],"Percepción de Espacios Públicos"))
+    return(c(rasters_list_names[1:7],"Percepción de Espacios Públicos"))
   } else if (tipo_obra == "Infraestructura Educación") {
-    return(c(rasters_list_names[1:8],"Percepción Infraestructura Educativa"))
+    return(c(rasters_list_names[1:7],"Percepción Infraestructura Educativa"))
   } else if (tipo_obra=='Infraestructura Salud'){
-    return(c(rasters_list_names[1:8],"Percepción Infraestructura Salud"))
+    return(c(rasters_list_names[1:7],"Percepción Infraestructura Salud"))
   }
 }
 
@@ -197,15 +201,15 @@ generar_lista_descripciones <- function(tipo_obra, tipo_vialidad = '') {
       return(c(descripciones_minimas[1], "Se mide en número de viajes. Mayor valor significa más pertinente la obra"))
     }
   } else if (tipo_obra == "Infraestructura Suministro de Agua") {
-    return(c(descripciones_minimas[1:6], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra", descripciones_minimas[8], "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
+    return(c(descripciones_minimas[1:6], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a agua entubada. I.e. más pertinente la obra", "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
   } else if (tipo_obra == "Infraestructura Drenaje") {
-    return(c(descripciones_minimas[1:6], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a drenaje sanitario. I.e. más pertinente la obra", descripciones_minimas[8], "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
+    return(c(descripciones_minimas[1:6], "Se mide en log-distancia. Menor distancia significa obra específica de una localidad sin acceso a drenaje sanitario. I.e. más pertinente la obra", "Se mide en percepción. Menor valor (percepción negativa) significa más pertinente la obra"))
   } else if (tipo_obra == "Espacios Públicos") {
-    return(c(descripciones_minimas[1:8],descripciones_Espacios_Publicos[1]))
+    return(c(descripciones_minimas[1:7],descripciones_Espacios_Publicos[1]))
   } else if (tipo_obra == "Infraestructura Educación") {
-    return(c(descripciones_minimas[1:8],descripciones_educacion[1]))
+    return(c(descripciones_minimas[1:7],descripciones_educacion[1]))
   } else if (tipo_obra=='Infraestructura Salud'){
-    return(c(descripciones_minimas[1:8],descripciones_salud[1]))
+    return(c(descripciones_minimas[1:7],descripciones_salud[1]))
   }
 }
 
@@ -218,18 +222,18 @@ generar_lista_rasters <- function(tipo_obra, tipo_vialidad = '') {
       raster_uso <- raster("Inputs/Rasters_Generados_en_R/Otros/nivel_de_uso_proxy_de_numero_de_viajes.tif")
       raster_uso <- ((raster_uso + 1) |> log() |> scale()) #|> aggregate(3)
       
-      return(list(raster_accesibilidad, -raster_uso)) ##Cambiamos la interpretación de accesibilidad. Debe ser una zona con alta accesibilidad y mucho uso
+      return(list(raster_accesibilidad, -raster_uso)) ##Cambiamos la interpretación de accesibilidad (no es cierto, no está cambiando). Debe ser una zona con alta accesibilidad y mucho uso
     }
   } else if (tipo_obra == "Infraestructura Suministro de Agua") {
-    return(c(rasters[1:6], rasters_agua[[1]], rasters[[8]], rasters_agua[[2]]))
+    return(c(rasters[1:6], rasters_agua[[1]], rasters_agua[[2]]))
   } else if (tipo_obra == "Infraestructura Drenaje") {
-    return(c(rasters[1:6], rasters_drenaje[[1]], rasters[[8]], rasters_drenaje[[2]]))
+    return(c(rasters[1:6], rasters_drenaje[[1]], rasters_drenaje[[2]]))
   } else if (tipo_obra == "Espacios Públicos") {
-    return(c(rasters[1:8],rasters_Espacios_publicos[[1]]))
+    return(c(rasters[1:7],rasters_Espacios_publicos[[1]]))
   } else if (tipo_obra == "Infraestructura Educación") {
-    return(c(rasters[1:8],rasters_educacion[[1]]))
+    return(c(rasters[1:7],rasters_educacion[[1]]))
   } else if (tipo_obra=='Infraestructura Salud'){
-    return(c(rasters[1:8],rasters_salud[[1]]))
+    return(c(rasters[1:7],rasters_salud[[1]]))
   }
 }
 
@@ -266,7 +270,7 @@ server <- function(input, output, session) {
   output$dynamic_sliders <- renderUI({
     titulos <- generar_lista_titulos(input$select_obras, input$select_nuevas_o_reconstrucciones)
     descripciones <- generar_lista_descripciones(input$select_obras, input$select_nuevas_o_reconstrucciones)
-    
+    raster_calculado(NULL)
     num_rasters <- length(titulos)
     print(num_rasters)
     if(num_rasters==2){
@@ -277,9 +281,9 @@ server <- function(input, output, session) {
           sliderInput(
             inputId = paste0("raster_weight_", i),
             label = descripciones[i],
-            min = limite_inferior[c(1,9)][[i]],
-            max = limite_superior[c(1,9)][[i]],
-            value = weights[c(1,9)][i],
+            min = limite_inferior[c(1,8)][[i]],
+            max = limite_superior[c(1,8)][[i]],
+            value = weights[c(1,8)][i],
             step = 0.01,
             width = "100%"
           )
@@ -311,7 +315,7 @@ server <- function(input, output, session) {
   shapes_seleccionados <- reactive({
     generar_lista_shapes(input$select_obras, input$select_nuevas_o_reconstrucciones)
   })
-  
+  raster_calculado=reactiveVal()
   dummy_raster_data <- eventReactive(input$generate_map_button, {
     num_rasters <- length(rasters_seleccionados())
     print(paste0("Numero de rasters_ sel", num_rasters))
@@ -335,6 +339,7 @@ server <- function(input, output, session) {
       }
     combined_raster <- Reduce(`+`, Map(`*`, current_rasters , -weights))
     combined_raster[abs(combined_raster)<1e-4]=NA
+    raster_calculado(1)
     return(combined_raster)
   })
   
@@ -449,6 +454,32 @@ server <- function(input, output, session) {
       }
     }
   )
+  observe({
+    if (is.null(raster_calculado())) {
+      shinyjs::disable("downloadTiff")
+    } else {
+      shinyjs::enable("downloadTiff")
+    }
+  })
+  output$downloadTiff <- downloadHandler(
+    filename = function() {
+      paste0("raster_", Sys.Date(), ".tif")
+    },
+    content = function(file) {
+      print(raster_calculado())
+      if(is.null(raster_calculado())){
+        showNotification(paste("No se ha generado ningún TIFF"), type = "error")
+        
+      }
+      else{
+        writeRaster(dummy_raster_data(), file, overwrite = TRUE)
+        showNotification("TIFF generado con éxito", type = "message", duration = 5)
+      }
+    }
+  )
 }
 
 shinyApp(ui, server)
+
+# rsconnect::writeManifest(".")
+# shiny2docker::shiny2docker(path = ".")
